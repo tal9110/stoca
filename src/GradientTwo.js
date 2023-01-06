@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from "react";
+import { RGBELoader } from "three-stdlib";
+
 import * as THREE from "three";
 import {
   Icosahedron,
@@ -8,10 +10,14 @@ import {
   shaderMaterial,
   Stars,
 } from "@react-three/drei";
-import { extend, useFrame, useThree } from "@react-three/fiber";
+import { extend, useFrame, useLoader, useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import { useState } from "react";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, MeshTransmissionMaterial } from "@react-three/drei";
+import { MeshPhysicalMaterial } from "three";
+import { FlakesTexture } from "three-stdlib";
+import { Edges } from "@react-three/drei";
+import { easing } from "maath";
 
 // import useRef from "react";
 
@@ -343,40 +349,65 @@ export default function GradientTwo(props) {
   //       gradientMaterial.uniforms.uColor[1].setRGB(colors[1].r, colors[1].g, colors[1].b);
   //     }
   //   });
-
+  const statueRef = useRef();
   const gradientRef = useRef();
+  const light = useRef();
+  let x = 0;
+  let y = 0;
+  const pointRef = useRef();
   useFrame((state, delta) => {
-    gradientRef.current.material.uniforms.time.value += delta / 40;
-    gradientRef.current.material.uniforms.opacity.value = props.opacity;
+    x += delta / 4;
+    y += delta / 5;
+    if (props.shape === "sphere") {
+      gradientRef.current.material.uniforms.time.value += delta / 40;
+      gradientRef.current.material.uniforms.opacity.value = props.opacity;
+    }
+    // console.log(statueRef);
+    // easing.damp3(
+    //   light.current.position,
+    //   [state.pointer.x * 12, -5, 12 + state.pointer.y * 4],
+    //   0.2,
+    //   delta
+    // );
+    // light.current.position.x = Math.sin(x) * 4;
+    // light.current.position.y = Math.cos(x) * 2;
+    // const speed = 0.01;
+    // const amplitude = 12;
+    // light.current.position.x = Math.sin(x % (2 * Math.PI)) * 12;
+    // light.current.position.z = 12 + Math.cos(y % (2 * Math.PI)) * 4;
 
-    // if (props.colorOne) {
-    //   // let whatever = new THREE.Color(props.colorOne);
-    //   console.log(whatever);
-    //   gradientRef.current.material.uniforms.uColor.value[0] = new THREE.Color(
-    //     props.colorOne
-    //   );
-    //   gradientRef.current.material.uniforms.uColor.value[1] = new THREE.Color(
-    //     props.colorTwo
-    //   );
-    //   gradientRef.current.material.uniforms.uColor.value[2] = new THREE.Color(
-    //     props.colorThree
-    //   );
-    //   gradientRef.current.material.uniforms.uColor.value[3] = new THREE.Color(
-    //     props.colorFour
-    //   );
-    //   gradientRef.current.material.uniforms.uColor.value[4] = new THREE.Color(
-    //     props.colorFive
-    //   );
-    // }
-    // }
+    // light.current.position.z = 12 + Math.cos(y) * 4;
+    pointRef.current.position.y = Math.sin(x * 1.5) * 5;
+    light.current.position.x = Math.sin(x * 1.2) * 8;
+    light.current.position.z = 12 + Math.cos(y * 1.2) * 4;
+    // console.log(light.current.position);
   });
-  const { nodes, materials } = useGLTF("/statue.glb");
+  const { nodes, materials } = useGLTF("/statue1.glb");
+  const texture = useLoader(
+    RGBELoader,
+    "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/aerodynamics_workshop_1k.hdr"
+  );
 
   return (
     <>
+      <pointLight ref={pointRef} intensity={1} position={[0, 0, -5]} />
+      <spotLight
+        angle={0.5}
+        penumbra={0.5}
+        ref={light}
+        castShadow
+        intensity={1}
+        shadow-mapSize={1024}
+        shadow-bias={-0.001}
+      >
+        <orthographicCamera
+          attach="shadow-camera"
+          args={[-10, 10, -10, 10, 0.1, 50]}
+        />
+      </spotLight>
       {props.shape === "sphere" ? (
         <mesh
-          // visible={false}
+          visible={false}
           receiveShadow
           rotation-y={-Math.PI / 2}
           ref={gradientRef}
@@ -396,20 +427,84 @@ export default function GradientTwo(props) {
             castShadow
             receiveShadow
             geometry={nodes.Buddha_statue.geometry}
+            side={THREE.DoubleSide}
             // material={materials["Default OBJ"]}
             // position={[38.04, 19.26, -28.28]}
             position={[3.5, 2.1, -3]}
             rotation={[Math.PI / 2, 0, 0]}
-            ref={gradientRef}
+            // material={iridescentMaterial}
+            ref={statueRef}
             scale={0.1}
           >
-            <gradientMaterial
+            {/* <sphereBufferGeometry args={[0.75, 2048, 2048]} /> */}
+            {/* <meshLambertMaterial color="#404044" /> */}
+
+            <meshPhysicalMaterial
+              // refraction={1.15}
+              roughness={0}
+              // rgbShift={0.25}
+              noise={0.04}
+              // contrast={1}
+              // saturation={1.0}
+              clearcoat={1}
+              clearcoatRoughness={0}
+              color="#000000"
+              bg="#000000"
+              envMapIntensity={1}
+              ior={1.25}
+              transmission={0.99}
+              opacity={0}
+            />
+            {/* <MeshTransmissionMaterial
+              samples={5}
+              clearcoat={1}
+              clearcoatRoughness={0.1}
+              refraction={2}
+              rgbShift={0.3}
+              contrast={6}
+              noise={0.03}
+              saturation={1.0}
+              color="#000000"
+              gColor="#000000"
+              shadow="#000000"
+              background={texture}
+            /> */}
+
+            {/* <meshStandardMaterial color="black" /> */}
+
+            {/* <gradientMaterial
               // side={THREE.BackSide}
               transparent={true}
               extensions={{
                 derivatives: "#extension GL_OES_standard_derivatives : enable",
               }}
-            />
+            /> */}
+            {/* <MeshTransmissionMaterial
+              roughness={0}
+              resolution={1024}
+              background={new THREE.Color("#000000")}
+              clearcoat={1}
+              samples={3}
+              refraction={1.15}
+              rgbShift={0.25}
+              noise={0.04}
+              contrast={2}
+              saturation={1.0}
+              color="#000000"
+              bg="#000000"
+            /> */}
+            {/* <meshPhysicalMaterial
+              thickness={5}
+              roughness={0}
+              clearcoat={1}
+              clearcoatRoughness={1}
+              transmission={0.5}
+              ior={1.25}
+              envMapIntensity={0}
+              color="#ffffff"
+              attenuationTint="#ffe79e"
+              attenuationDistance={0}
+            /> */}
           </mesh>
         </group>
       )}
@@ -417,4 +512,4 @@ export default function GradientTwo(props) {
   );
 }
 
-useGLTF.preload("/statue.glb");
+useGLTF.preload("/statue1.glb");

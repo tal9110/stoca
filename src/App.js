@@ -1,8 +1,12 @@
 import "./styles.css";
 import { Canvas, extend, useFrame, useLoader } from "@react-three/fiber";
 import { Leva } from "leva";
+import { useThree } from "@react-three/fiber";
+import { useFBO } from "@react-three/drei";
 import styled from "styled-components";
-
+import { FXAAShader } from "three-stdlib";
+import { AdditiveBlendingShader } from "./AdditiveBlendingShader";
+import { VolumetricLightShader } from "./VolumetricLightShader";
 import {
   Button,
   Image,
@@ -37,6 +41,7 @@ import {
   Effects,
   Environment,
   Center,
+  Edges,
 } from "@react-three/drei";
 import { ControlledInput } from "./ControlledInput";
 import Gradient from "./Gradient";
@@ -249,7 +254,7 @@ function App() {
         }}
       >
         {/* <Center> */}
-        <Stack>
+        {/* <Stack>
           <TextInput
             mt={200}
             label="How are you feeling?"
@@ -287,12 +292,16 @@ function App() {
           <Text size={"xl"} weight={"bolder"}>
             {finalPrompt}
           </Text>
-        </Stack>
+        </Stack> */}
         {/* </Center> */}
       </div>
 
       {/* <Canvas eventPrefix="client" shadows camera={{ position: [1, 0, 0] }}> */}
-      <Canvas shadows camera={{ position: [0, 0, 4.5], fov: 50 }}>
+      <Canvas
+        shadows
+        camera={{ position: [0, 0, 4.5], fov: 50 }}
+        gl={{ antialias: false }}
+      >
         {/* <color attach="background" args={["#f0f0f"]} /> */}
         {/* <group scale={1}><Puzzle /></group> */}
         {/* <ambientLight intensity={1} /> */}
@@ -361,9 +370,9 @@ function App() {
           </AccumulativeShadows> */}
         {/* </group> */}
         {/* <Environment preset="city" /> */}
-        {/* <Postpro /> */}
+        <Postpro />
         {/* <Rig /> */}
-        <group position={[0, -0.65, 0]}>
+        <group position={[0.2, -1.5, 0]}>
           <Sphere2
             colorOne={colorOne}
             colorTwo={colorTwo}
@@ -371,23 +380,6 @@ function App() {
             colorFour={colorFour}
             colorFive={colorFive}
           />
-          <AccumulativeShadows
-            temporal
-            frames={200}
-            color="purple"
-            colorBlend={0.5}
-            opacity={1}
-            scale={10}
-            alphaTest={0.85}
-          >
-            <RandomizedLight
-              amount={8}
-              radius={5}
-              ambient={0.5}
-              position={[5, 3, 2]}
-              bias={0.001}
-            />
-          </AccumulativeShadows>
         </group>
         <Env />
         {/* <OrbitControls enablePan={false} enableZoom={false} /> */}
@@ -398,6 +390,8 @@ function App() {
           // enableZoom={false}
           minPolarAngle={Math.PI / 2.1}
           maxPolarAngle={Math.PI / 2.1}
+          // minPolarAngle={Math.PI / 3.1}
+          // maxPolarAngle={Math.PI / 2.1}
         />
       </Canvas>
     </>
@@ -431,19 +425,43 @@ function Env() {
   //     onChange: (value) => startTransition(() => setPreset(value)),
   //   },
   // });
-  return <Environment preset={preset} background blur={0.65} />;
+  return <Environment preset={"night"} background blur={0.65} />;
 }
 function Sphere2(props) {
   // const { roughness } = useControls({
   //   roughness: { value: 1, min: 0, max: 1 },
   // });
-  // useFrame(() => {
-  //   console.log(gradientRef.current.position);
+
+  const randomLight = useRef();
+  let x = 0;
+  // useFrame((state, delta) => {
+  //   x += delta;
+  //   // console.log(randomLight.current);
+  //   randomLight.current.position.x = Math.sin(x);
   // });
 
   return (
     <>
-      <group scale={5}>
+      <AccumulativeShadows
+        temporal
+        frames={200}
+        color="purple"
+        colorBlend={0.5}
+        opacity={1}
+        scale={10}
+        alphaTest={0.85}
+      >
+        <group ref={randomLight}>
+          <RandomizedLight
+            amount={8}
+            radius={3}
+            ambient={0.5}
+            position={[7, 6, 2]}
+            bias={0.001}
+          />
+        </group>
+      </AccumulativeShadows>
+      <group scale={20}>
         <GradientTwo
           shape={"sphere"}
           opacity={0.5}
@@ -463,8 +481,19 @@ function Sphere2(props) {
         colorFour={props.colorFour}
         colorFive={props.colorFive}
       />
+      {/* <group position={[-1, 0, 0]}>
+        <GradientTwo
+          shape={"statue"}
+          opacity={1}
+          colorOne={props.colorOne}
+          colorTwo={props.colorTwo}
+          colorThree={props.colorThree}
+          colorFour={props.colorFour}
+          colorFive={props.colorFive}
+        />
+      </group> */}
       <Center top>
-        <mesh castShadow>
+        <mesh castShadow visible={false}>
           <sphereGeometry args={[0.74, 64, 64]} />
           <meshStandardMaterial
             transparent
@@ -478,14 +507,57 @@ function Sphere2(props) {
   );
 }
 
+// function Postpro() {
+//   const ref = useRef();
+//   // useFrame((state) => (ref.current.time = state.clock.elapsedTime * 3));
+//   return (
+//     <Effects>
+//       {/* <waterPass ref={ref} factor={0.4} /> */}
+//       {/* <glitchPass /> */}
+//     </Effects>
+//   );
+// }
+const DEFAULT_LAYER = 0;
+const OCCLUSION_LAYER = 1;
+
 function Postpro() {
-  const ref = useRef();
-  useFrame((state) => (ref.current.time = state.clock.elapsedTime * 3));
+  const { gl, camera, size } = useThree();
+  const occlusionRenderTarget = useFBO();
+  const occlusionComposer = useRef();
+  const composer = useRef();
+  useFrame(() => {
+    camera.layers.set(OCCLUSION_LAYER);
+    occlusionComposer.current.render();
+    camera.layers.set(DEFAULT_LAYER);
+    composer.current.render();
+  }, 1);
   return (
-    <Effects>
-      <waterPass ref={ref} factor={0.2} />
-      {/* <glitchPass /> */}
-    </Effects>
+    <>
+      <mesh layers={OCCLUSION_LAYER} position={[0, 1.5, -5]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshBasicMaterial />
+      </mesh>
+      <Effects
+        ref={occlusionComposer}
+        disableGamma
+        disableRender
+        args={[gl, occlusionRenderTarget]}
+        renderToScreen={false}
+      >
+        <shaderPass args={[VolumetricLightShader]} needsSwap={false} />
+      </Effects>
+      <Effects ref={composer} disableRender>
+        <shaderPass
+          args={[AdditiveBlendingShader]}
+          uniforms-tAdd-value={occlusionRenderTarget.texture}
+        />
+        <shaderPass
+          args={[FXAAShader]}
+          uniforms-resolution-value={[1 / size.width, 1 / size.height]}
+          renderToScreen
+        />
+      </Effects>
+    </>
   );
 }
 
