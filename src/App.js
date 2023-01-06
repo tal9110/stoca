@@ -5,8 +5,13 @@ import { useThree } from "@react-three/fiber";
 import { useFBO } from "@react-three/drei";
 import styled from "styled-components";
 import { FXAAShader } from "three-stdlib";
-import { AdditiveBlendingShader } from "./AdditiveBlendingShader";
-import { VolumetricLightShader } from "./VolumetricLightShader";
+import { AdditiveBlendingShader } from "./shaders/AdditiveBlendingShader";
+import { VolumetricLightShader } from "./shaders/VolumetricLightShader";
+import { AfterimagePass } from "three/examples/jsm/postprocessing/AfterimagePass";
+import { GrainyShader } from "./shaders/GrainyShader";
+import { TrailsShader } from "./shaders/TrailsShader";
+
+import Mantine from "./Mantine/Mantine";
 import {
   Button,
   Image,
@@ -49,9 +54,10 @@ import { StripeGradient } from "./StripeGradient";
 import GradientTwo from "./GradientTwo";
 import { HiOutlineArrowSmRight } from "react-icons/hi";
 import { BsArrowRightShort } from "react-icons/bs";
+import { Fog } from "three";
 // import Puzzle from "./Puzzle";
 
-extend({ WaterPass, GlitchPass });
+extend({ WaterPass, GlitchPass, AfterimagePass });
 
 const useStyles = createStyles((theme, { floating }) => ({
   root: {
@@ -159,9 +165,9 @@ function App() {
     floating: value.trim().length !== 0 || focused,
   });
   const [userInput, setUserInput] = useState("");
-  const openingStatement =
-    "The following is a conversation with an AI therapist. The therapist is helpful, creative, clever, very friendly, not shy of digging deeper, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling?\nHuman: ";
-  const [prevPrompt, setPrevPrompt] = useState(openingStatement);
+  // const openingStatement =
+  //   "The following is a conversation with an AI therapist. The therapist is helpful, creative, clever, very friendly, not shy of digging deeper, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling?\nHuman: ";
+  // const [prevPrompt, setPrevPrompt] = useState(openingStatement);
   const [prompt, setPrompt] = useState("");
 
   // const generateResponse2 = async () => {
@@ -183,15 +189,17 @@ function App() {
   // };
   const [finalPrompt, setFinalPrompt] = useState(
     "The following is a conversation with an AI therapist. The therapist is helpful, creative, clever, very friendly, not shy of digging deeper, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
+    // "The following is a conversation with an AI therapist. The therapist is stoic, helpful, creative, clever, very friendly, gives a piece of wisdom, and asks a follow up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
   );
   const [inputValue, setInputValue] = useState("");
+  const [firstClick, setFirstClick] = useState(0);
   const generateResponse2 = async () => {
-    // console.log(inputValue);
+    setFirstClick(firstClick + 1);
     const combined =
       finalPrompt +
       "\nHuman:" +
       inputValue +
-      " and i need some advice" +
+      " and I would like some advice on that" +
       "\nAI:";
 
     // console.log(combined);
@@ -253,8 +261,9 @@ function App() {
           width: "100%",
         }}
       >
+        {/* <Mantine /> */}
         {/* <Center> */}
-        {/* <Stack>
+        <Stack>
           <TextInput
             mt={200}
             label="How are you feeling?"
@@ -292,7 +301,7 @@ function App() {
           <Text size={"xl"} weight={"bolder"}>
             {finalPrompt}
           </Text>
-        </Stack> */}
+        </Stack>
         {/* </Center> */}
       </div>
 
@@ -302,6 +311,7 @@ function App() {
         camera={{ position: [0, 0, 4.5], fov: 50 }}
         gl={{ antialias: false }}
       >
+        {/* <fog attach="fog" args={[0x000000, 5, 20]} /> */}
         {/* <color attach="background" args={["#f0f0f"]} /> */}
         {/* <group scale={1}><Puzzle /></group> */}
         {/* <ambientLight intensity={1} /> */}
@@ -374,6 +384,7 @@ function App() {
         {/* <Rig /> */}
         <group position={[0.2, -1.5, 0]}>
           <Sphere2
+            firstClick={firstClick}
             colorOne={colorOne}
             colorTwo={colorTwo}
             colorThree={colorThree}
@@ -463,8 +474,11 @@ function Sphere2(props) {
       </AccumulativeShadows>
       <group scale={20}>
         <GradientTwo
+          firstClick={props.firstClick}
           shape={"sphere"}
-          opacity={0.5}
+          // opacity={0.5}
+          // opacity={0.5}
+          // opacity={0}
           colorOne={props.colorOne}
           colorTwo={props.colorTwo}
           colorThree={props.colorThree}
@@ -507,16 +521,6 @@ function Sphere2(props) {
   );
 }
 
-// function Postpro() {
-//   const ref = useRef();
-//   // useFrame((state) => (ref.current.time = state.clock.elapsedTime * 3));
-//   return (
-//     <Effects>
-//       {/* <waterPass ref={ref} factor={0.4} /> */}
-//       {/* <glitchPass /> */}
-//     </Effects>
-//   );
-// }
 const DEFAULT_LAYER = 0;
 const OCCLUSION_LAYER = 1;
 
@@ -525,10 +529,12 @@ function Postpro() {
   const occlusionRenderTarget = useFBO();
   const occlusionComposer = useRef();
   const composer = useRef();
-  useFrame(() => {
+  useFrame((state, delta) => {
     camera.layers.set(OCCLUSION_LAYER);
     occlusionComposer.current.render();
     camera.layers.set(DEFAULT_LAYER);
+    // console.log(composer.current.passes[4].uniforms);
+    // composer.current.passes[4].uniforms.time.value += delta / 10;
     composer.current.render();
   }, 1);
   return (
@@ -551,9 +557,17 @@ function Postpro() {
           args={[AdditiveBlendingShader]}
           uniforms-tAdd-value={occlusionRenderTarget.texture}
         />
+
         <shaderPass
           args={[FXAAShader]}
           uniforms-resolution-value={[1 / size.width, 1 / size.height]}
+          renderToScreen
+        />
+        <shaderPass
+          args={[TrailsShader]}
+          uniforms-tDiffuse-value={occlusionRenderTarget.texture}
+          // uniforms-amount-value={0.5}
+          uniforms-time-value={0}
           renderToScreen
         />
       </Effects>

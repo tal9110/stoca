@@ -39,7 +39,7 @@ const GradientMaterial = shaderMaterial(
     uColor: newPalette,
 
     resolution: new THREE.Vector4(),
-    opacity: 1,
+    opacity: 0,
     modifier: 1,
     // u: 1,
     // amplitude: 0.5,
@@ -234,6 +234,16 @@ export default function GradientTwo(props) {
   ]);
 
   useEffect(() => {
+    if (props.firstClick === 1) {
+      gsap.to(gradientRef.current.material.uniforms.opacity, {
+        value: 0.5,
+        duration: 6,
+        ease: "power1.out",
+      });
+    }
+  }, [props.firstClick]);
+
+  useEffect(() => {
     // console.log(props.colorOne);
     // console.log(props.colorTwo);
     let threeColorOne = new THREE.Color(props.colorOne);
@@ -360,7 +370,7 @@ export default function GradientTwo(props) {
     y += delta / 5;
     if (props.shape === "sphere") {
       gradientRef.current.material.uniforms.time.value += delta / 40;
-      gradientRef.current.material.uniforms.opacity.value = props.opacity;
+      // gradientRef.current.material.uniforms.opacity.value = props.opacity;
     }
     // console.log(statueRef);
     // easing.damp3(
@@ -407,7 +417,7 @@ export default function GradientTwo(props) {
       </spotLight>
       {props.shape === "sphere" ? (
         <mesh
-          visible={false}
+          // visible={false}
           receiveShadow
           rotation-y={-Math.PI / 2}
           ref={gradientRef}
