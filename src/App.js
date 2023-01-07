@@ -10,8 +10,11 @@ import { VolumetricLightShader } from "./shaders/VolumetricLightShader";
 import { AfterimagePass } from "three/examples/jsm/postprocessing/AfterimagePass";
 import { GrainyShader } from "./shaders/GrainyShader";
 import { TrailsShader } from "./shaders/TrailsShader";
+import Particles from "./shaders/Particles";
+import { Infinite } from "./shaders/Infinite";
 
 import Mantine from "./Mantine/Mantine";
+import gsap from "gsap";
 import {
   Button,
   Image,
@@ -55,7 +58,7 @@ import GradientTwo from "./GradientTwo";
 import { HiOutlineArrowSmRight } from "react-icons/hi";
 import { BsArrowRightShort } from "react-icons/bs";
 import { Fog } from "three";
-// import Puzzle from "./Puzzle";
+import AudioController from "./AudioController";
 
 extend({ WaterPass, GlitchPass, AfterimagePass });
 
@@ -115,49 +118,6 @@ function App() {
   const [colorFive, setColorFive] = useState("#A8D9D8");
   const [word, setWord] = useState("");
 
-  // const generateResponse = async () => {
-  //   setFocused(true);
-  // const response = await openai.createCompletion({
-  //   model: "text-davinci-003",
-  //   // prompt:
-  //   //   "The CSS code for a color like " + prompt + ":\n\nbackground-color: #",
-  //   prompt:
-  //     "Five different hex value colors that are a color palette for " +
-  //     prompt +
-  //     " , and then on a new line describe the overall palette as either light or dark: \n\n",
-  //   temperature: 0,
-  //   max_tokens: 64,
-  //   top_p: 1.0,
-  //   frequency_penalty: 0.0,
-  //   presence_penalty: 0.0,
-  //   stop: [";"],
-  // });
-
-  // console.log(response.data.choices[0].text, "response");
-  // let split = response.data.choices[0].text
-  //   .split(",")
-  //   .map((color) => color.split("#")[1]);
-  // // console.log(split, "split");
-  // // console.log(split[0].slice(0, 6));
-  // // console.log(split[1]);
-  // // console.log(split[2]);
-  // // console.log(split[4]);
-  // // console.log(split[4].trim().split(" ")[1]);
-  // // console.log(split[4]);
-  // setColorOne("#" + split[0].slice(0, 6));
-  // setColorTwo("#" + split[1].slice(0, 6));
-  // setColorThree("#" + split[2].slice(0, 6));
-  // setColorFour("#" + split[3].slice(0, 6));
-  // setColorFive("#" + split[4].slice(0, 6));
-  // if (split[4].trim().includes("Light")) {
-  //   setWord("light");
-  //   console.log("light success");
-  // }
-  // if (split[4].trim().includes("Dark")) {
-  //   setWord("dark");
-  //   console.log("dark success");
-  // }
-  // };
   const [response2, setResponse2] = useState("");
   const [focused, setFocused] = useState(false);
   const [value, setValue] = useState("");
@@ -253,6 +213,12 @@ function App() {
 
   return (
     <>
+      {/* <audio ref={audioRef} /> */}
+      {/* {audioRefs.current.map((audioRef, index) => (
+        <audio key={index} ref={audioRef} />
+      ))} */}
+      <AudioController />
+
       <div
         style={{
           position: "absolute",
@@ -263,13 +229,19 @@ function App() {
       >
         {/* <Mantine /> */}
         {/* <Center> */}
-        <Stack>
+        {/* <Group mt={50}>
+          <Text class="line-1 anim-typewriter">
+            what are you struggling with today?
+          </Text>
+        </Group> */}
+        <Stack hidden>
           <TextInput
             mt={200}
             label="How are you feeling?"
             classNames={classes}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
+            // onKeyPress={handleKeyPress}
             radius="xl"
             size="md"
             placeholder="like a bright blue sky at dusk..."
@@ -308,7 +280,8 @@ function App() {
       {/* <Canvas eventPrefix="client" shadows camera={{ position: [1, 0, 0] }}> */}
       <Canvas
         shadows
-        camera={{ position: [0, 0, 4.5], fov: 50 }}
+        // camera={{ position: [0, 0, 4.5], fov: 50 }}
+        camera={{ position: [0, 0, 6.5], fov: 50 }}
         gl={{ antialias: false }}
       >
         {/* <fog attach="fog" args={[0x000000, 5, 20]} /> */}
@@ -395,8 +368,9 @@ function App() {
         <Env />
         {/* <OrbitControls enablePan={false} enableZoom={false} /> */}
         <OrbitControls
+          // enabled={false}
           // autoRotate
-          autoRotateSpeed={2}
+          // autoRotateSpeed={2}
           // enablePan={false}
           // enableZoom={false}
           minPolarAngle={Math.PI / 2.1}
@@ -404,6 +378,9 @@ function App() {
           // minPolarAngle={Math.PI / 3.1}
           // maxPolarAngle={Math.PI / 2.1}
         />
+        {/* <group scale={0.5}>
+          <Particles />
+        </group> */}
       </Canvas>
     </>
   );
@@ -451,6 +428,19 @@ function Sphere2(props) {
   //   randomLight.current.position.x = Math.sin(x);
   // });
 
+  const { camera } = useThree();
+  const moveCamera = () => {
+    gsap.to(camera.position, {
+      // x: -8,
+      z: -20,
+      duration: 3,
+      ease: "power1.out",
+    });
+  };
+  // useFrame(() => {
+  //   // camera.lookAt(0, 0, 0);
+  // });
+
   return (
     <>
       <AccumulativeShadows
@@ -467,7 +457,8 @@ function Sphere2(props) {
             amount={8}
             radius={3}
             ambient={0.5}
-            position={[7, 6, 2]}
+            // position={[7, 6, 2]}
+            position={[0, 6, -7]}
             bias={0.001}
           />
         </group>
@@ -486,15 +477,17 @@ function Sphere2(props) {
           colorFive={props.colorFive}
         />
       </group>
-      <GradientTwo
-        shape={"statue"}
-        opacity={1}
-        colorOne={props.colorOne}
-        colorTwo={props.colorTwo}
-        colorThree={props.colorThree}
-        colorFour={props.colorFour}
-        colorFive={props.colorFive}
-      />
+      <group onClick={() => moveCamera()}>
+        <GradientTwo
+          shape={"statue"}
+          opacity={1}
+          colorOne={props.colorOne}
+          colorTwo={props.colorTwo}
+          colorThree={props.colorThree}
+          colorFour={props.colorFour}
+          colorFive={props.colorFive}
+        />
+      </group>
       {/* <group position={[-1, 0, 0]}>
         <GradientTwo
           shape={"statue"}
@@ -529,12 +522,55 @@ function Postpro() {
   const occlusionRenderTarget = useFBO();
   const occlusionComposer = useRef();
   const composer = useRef();
+  let x = 0;
+  // useEffect(() => {
+  //   gsap.to(occlusionComposer.current.passes[1].uniforms.weight, {
+  //     value: 0.4,
+  //     duration: 8,
+  //     // ease: "power1.out",
+  //   });
+  // }, []);
   useFrame((state, delta) => {
+    x += delta / 2;
     camera.layers.set(OCCLUSION_LAYER);
     occlusionComposer.current.render();
     camera.layers.set(DEFAULT_LAYER);
     // console.log(composer.current.passes[4].uniforms);
-    // composer.current.passes[4].uniforms.time.value += delta / 10;
+    // console.log(occlusionComposer.current.passes[1].uniforms);
+    // occlusionComposer.current.passes[1].uniforms.weight.value =
+    //   Math.sin(x / 2 + 0.5) / 5;
+    // gsap.to(occlusionComposer.current.passes[1].uniforms.weight, {
+    //   value: 0.5,
+    //   duration: 6,
+    //   ease: "power1.out",
+    // });
+    // decay: {
+    //   value: 0.95;
+    // }
+    // density: {
+    //   value: 0.8;
+    // }
+    // exposure: {
+    //   value: 0.1;
+    // }
+    // lightPosition: {
+    //   value: Vector2;
+    // }
+    // samples: {
+    //   value: 50;
+    // }
+    // tDiffuse: {
+    //   value: Texture;
+    // }
+    // weight: {
+    //   value: 0.5;
+    // }
+
+    // composer.current.passes[4].uniforms.time.value += delta / 2;
+    // composer.current.passes[5].uniforms.time.value += delta;
+
+    // composer.current.passes[4].uniforms.tDiffuse.value =
+    //   occlusionRenderTarget.texture;
     composer.current.render();
   }, 1);
   return (
@@ -550,7 +586,11 @@ function Postpro() {
         args={[gl, occlusionRenderTarget]}
         renderToScreen={false}
       >
-        <shaderPass args={[VolumetricLightShader]} needsSwap={false} />
+        <shaderPass
+          uniforms-weight-value={0.4}
+          args={[VolumetricLightShader]}
+          needsSwap={false}
+        />
       </Effects>
       <Effects ref={composer} disableRender>
         <shaderPass
@@ -563,13 +603,28 @@ function Postpro() {
           uniforms-resolution-value={[1 / size.width, 1 / size.height]}
           renderToScreen
         />
-        <shaderPass
+        {/* <shaderPass
           args={[TrailsShader]}
           uniforms-tDiffuse-value={occlusionRenderTarget.texture}
           // uniforms-amount-value={0.5}
           uniforms-time-value={0}
           renderToScreen
+        /> */}
+        <shaderPass
+          args={[GrainyShader]}
+          uniforms-tDiffuse-value={occlusionRenderTarget.texture}
+          // uniforms-amount-value={0.5}
+          uniforms-time-value={0}
+          renderToScreen
         />
+        {/* <shaderPass
+          args={[Infinite]}
+          // uniforms-tDiffuse-value={occlusionRenderTarget.texture}
+          // uniforms-amount-value={0.5}
+          uniforms-tMap-value={occlusionRenderTarget.texture}
+          uniforms-time-value={0}
+          renderToScreen
+        /> */}
       </Effects>
     </>
   );

@@ -370,7 +370,7 @@ export default function GradientTwo(props) {
     y += delta / 5;
     if (props.shape === "sphere") {
       gradientRef.current.material.uniforms.time.value += delta / 40;
-      // gradientRef.current.material.uniforms.opacity.value = props.opacity;
+      // gradientRef.current.material.uniforms.opacity.value = 0.5;
     }
     // console.log(statueRef);
     // easing.damp3(
