@@ -196,10 +196,97 @@ input:focus {
 
 @font-face {
   font-family: "customFont";
-  src: url("/public/Fratelli.otf");
+  src: url("/public/fonts/PPMori-SemiBold.otf");
+}
+@font-face {
+  font-family: "customFont2";
+  src: url("/public/fonts/PPMori-SemiBoldItalic.otf");
+}
+.theHeader {
+  font-family: "customFont";
+  font-size:60px;
+  text-align: "center";
+  /* opacity: 0.5; */
+  /* z-index: 10; */
+
+  /* background: linear-gradient(to left, black, transparent); */
+  /* background:  radial-gradient(at center, #A8A28F 50%, transparent); */
+  /* background:  linear-gradient(to bottom, #A8A28F 30%, transparent);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; */
+  
+  /* color: #4F483A; */
+    /* color: #E8DDD2; */
+    /* color:  #A8A28F */
+    color:  #53504A
+    ;
+}
+.theHeaderInput {
+  font-family: "customFont";
+  font-size:60px;
+  text-align: "center";
+  line-height: 1.2;
+  opacity: 0.5;
+
+
+  /* background: linear-gradient(to left, black, transparent); */
+  /* background:  radial-gradient(at center, #A8A28F 50%, transparent); */
+  /* background:  linear-gradient(to bottom, #A8A28F 30%, transparent);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; */
+  
+  /* color: #4F483A; */
+    /* color: #E8DDD2; */
+    /* color:  #A8A28F */
+    color:  #53504A
+    ;
+}
+.theInput {
+  font-family: "customFont";
+  font-size:45px;
+  /* background: linear-gradient(to left, black, transparent); */
+  /* background:  radial-gradient(at center, #A8A28F, transparent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; */
+  
+  /* color: #4F483A; */
+    /* color: #E8DDD2; */
+      /* background: linear-gradient(to left, black, transparent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;  */
+
+    color:  #A8A28F
+    ;
+
+
+}
+.theResponse {
+  /* width: 100px; */
+  font-family: "customFont";
+  font-size:30px;
+  text-align: "center";
+
+  /* background: linear-gradient(to left, black, transparent); */
+  /* background:  radial-gradient(at center, #A8A28F 50%, transparent); */
+  /* background:  linear-gradient(to bottom, #A8A28F 30%, transparent);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; */
+  
+  /* color: #4F483A; */
+    /* color: #E8DDD2; */
+    /* color:  #A8A28F */
+    color:  #53504A
+
+
+    ;
+
+
 }
 
-.line-1{
+/* .line-1{
   font-family: "customFont";
     position: relative;
     top: 50%;  
@@ -211,7 +298,7 @@ input:focus {
     white-space: nowrap;
     overflow: hidden;
     transform: translateY(-50%);    
-}
+} */
 
 /* Animation */
 .anim-typewriter{
@@ -226,3 +313,57 @@ input:focus {
   from{border-right-color: rgba(255,255,255,.75);}
   to{border-right-color: transparent;}
 }
+
+.blinking-cursor {
+  height: 100vh;
+  font-size: 4em;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.blinking-cursor:after {
+  content: '';
+  width: 5px;
+  height: .9em;
+  background-color: black;
+  margin-left: 20px;
+  animation-name: blinking;
+  animation-duration: .7s;
+  animation-direction: alternative;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes blinking {
+  50%{background-color: white;}
+  100%{background-color: black;}
+}
+
+.main-container {
+  position: relative;
+  height: 100px;
+}
+
+.main-container .scrollable-nav {
+  overflow: scroll;
+  height: 100%;
+}
+
+.list-item-container {
+  list-style: none;
+  font-size: 20px;
+
+}
+
+.list-item-container > .m-item:last-child{
+   background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.7) 5%, #fff 100%);
+
+}
+li {
+  padding-right: 30px;
+}
+
+

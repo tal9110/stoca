@@ -12,6 +12,15 @@ import { GrainyShader } from "./shaders/GrainyShader";
 import { TrailsShader } from "./shaders/TrailsShader";
 import Particles from "./shaders/Particles";
 import { Infinite } from "./shaders/Infinite";
+import TypeIt from "typeit-react";
+import { Howl, Howler } from "howler";
+import useStore from "./store";
+import { useSpring, animated } from "@react-spring/web";
+import Loader from "react-loaders";
+import { PulseLoader } from "react-spinners";
+import { GrCircleQuestion } from "react-icons/gr";
+import { IconContext } from "react-icons";
+import { VscQuestion } from "react-icons/vsc";
 
 import Mantine from "./Mantine/Mantine";
 import gsap from "gsap";
@@ -20,7 +29,7 @@ import {
   Image,
   Text,
   Group,
-  // Center,
+  Center as CenterMantine,
   Container,
   ActionIcon,
   Stack,
@@ -62,49 +71,7 @@ import AudioController from "./AudioController";
 
 extend({ WaterPass, GlitchPass, AfterimagePass });
 
-const useStyles = createStyles((theme, { floating }) => ({
-  root: {
-    position: "relative",
-  },
-
-  label: {
-    position: "absolute",
-    zIndex: 2,
-    top: 7,
-    left: theme.spacing.sm,
-    pointerEvents: "none",
-    color: floating
-      ? theme.colorScheme === "dark"
-        ? theme.white
-        : theme.white
-      : theme.colorScheme === "dark"
-      ? theme.white
-      : theme.white,
-    transform: floating
-      ? `translate(-${theme.spacing.xs / 2}px, -28px)`
-      : `translate(-${theme.spacing.xs / 2}px, -28px)`,
-    fontSize: floating ? theme.fontSizes.xs : theme.fontSizes.xs,
-    fontWeight: floating ? 400 : 400,
-  },
-
-  required: {
-    transition: "opacity 150ms ease",
-    opacity: floating ? 1 : 0,
-  },
-
-  input: {
-    "&::placeholder": {
-      transition: "color 150ms ease",
-      color: !floating ? "transparent" : undefined,
-    },
-  },
-}));
-
 function App() {
-  useLayoutEffect(() => {
-    const gradient = new StripeGradient();
-    gradient.initGradient("#gradient-canvas");
-  }, []);
   const configuration = new Configuration({
     apiKey: process.env.REACT_APP_OPENAI_API_KEY,
   });
@@ -121,9 +88,7 @@ function App() {
   const [response2, setResponse2] = useState("");
   const [focused, setFocused] = useState(false);
   const [value, setValue] = useState("");
-  const { classes } = useStyles({
-    floating: value.trim().length !== 0 || focused,
-  });
+
   const [userInput, setUserInput] = useState("");
   // const openingStatement =
   //   "The following is a conversation with an AI therapist. The therapist is helpful, creative, clever, very friendly, not shy of digging deeper, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling?\nHuman: ";
@@ -148,18 +113,21 @@ function App() {
   //   setResponse2(response.data.choices[0].text);
   // };
   const [finalPrompt, setFinalPrompt] = useState(
-    "The following is a conversation with an AI therapist. The therapist is helpful, creative, clever, very friendly, not shy of digging deeper, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
+    // "The following is a conversation with an AI therapist. The therapist is helpful, creative, clever, very friendly, not shy of digging deeper, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
     // "The following is a conversation with an AI therapist. The therapist is stoic, helpful, creative, clever, very friendly, gives a piece of wisdom, and asks a follow up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
+    "The following is a conversation with an AI Stoic Philosopher. The philosopher is helpful, creative, clever, very friendly, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
   );
   const [inputValue, setInputValue] = useState("");
   const [firstClick, setFirstClick] = useState(0);
-  const generateResponse2 = async () => {
+  const [aiOutput, setAiOutput] = useState();
+  const [last, setLast] = useState();
+  const generateResponse2 = async (inputt) => {
     setFirstClick(firstClick + 1);
     const combined =
       finalPrompt +
       "\nHuman:" +
-      inputValue +
-      " and I would like some advice on that" +
+      inputt +
+      // " and I would like some advice on that" +
       "\nAI:";
 
     // console.log(combined);
@@ -178,7 +146,7 @@ function App() {
       model: "text-davinci-003",
       prompt:
         "Five different hex value colors that are a color palette for " +
-        inputValue +
+        inputt +
         " , and then on a new line describe the overall palette as either light or dark: \n\n",
       temperature: 0,
       max_tokens: 64,
@@ -186,6 +154,51 @@ function App() {
       frequency_penalty: 0.0,
       presence_penalty: 0.0,
       stop: [";"],
+    });
+    // const newTypeIt = (
+    //   <TypeIt
+    //     className="theHeader"
+    //     options={{
+    //       afterComplete: () => {
+    //         document.querySelector(".ti-cursor").style.display = "none";
+    //       },
+    //     }}
+    //   >
+    //     {response.data.choices[0].text}
+    //   </TypeIt>
+    // );
+    // setTypeIts([newTypeIt]);
+    // typeIts.shift();
+    setAiOutput(response.data.choices[0].text);
+    api4.start({
+      delay: 200,
+
+      from: {
+        opacity: 1,
+      },
+      to: {
+        opacity: 0,
+      },
+      config: {
+        duration: 1500,
+      },
+      onResolve: () => {
+        setLoading(false);
+      },
+    });
+
+    api3.start({
+      delay: 1000,
+
+      from: {
+        opacity: 0,
+      },
+      to: {
+        opacity: 1,
+      },
+      config: {
+        duration: 1000,
+      },
     });
     // console.log(response2.data.choices[0].text, "response2");
     let split = response2.data.choices[0].text
@@ -211,14 +224,263 @@ function App() {
     setFinalPrompt(appended);
   };
 
+  const [typeIts, setTypeIts] = useState([]);
+  useEffect(() => {
+    if (aiOutput === undefined) return;
+    const newTypeIt = (
+      <TypeIt
+        className="theResponse"
+        options={{
+          afterComplete: () => {
+            document.querySelector(".ti-cursor").style.display = "none";
+          },
+          speed: 60,
+        }}
+      >
+        {aiOutput}
+      </TypeIt>
+    );
+    console.log(typeIts);
+
+    setTypeIts([...typeIts, newTypeIt]);
+    // console.log(typeIts);
+  }, [aiOutput]);
+
+  // const generateResponse3 = (inputt) => {
+  //   setAiOutput(inputt);
+  // };
+
+  useEffect(() => {
+    const sound = new Howl({
+      src: [`/audio/bed.mp3`],
+      volume: 0.5,
+      loop: true,
+    });
+    sound.play();
+  }, []);
+
+  const inputStore = useStore((state) => state.inputStore);
+  // const step = useStore((state) => state.step);
+  const [firstInput, setFirstInput] = useState(false);
+  const [inputHeaderText, setInputHeaderText] = useState("");
+  const [enterIncrement, setEnterIncrement] = useState(0);
+  useEffect(() => {
+    setEnterIncrement(enterIncrement + 1);
+    // console.log(step);
+    if (inputStore.length > 0) {
+      // gsap.to(camera.position, {
+      //   z: 20,
+      //   duration: 4,
+      //   ease: "power1.inOut",
+      // });
+      setLoading(true);
+      // setFirstInput(true);
+
+      api.start({
+        delay: 100,
+
+        from: {
+          opacity: 1,
+        },
+        to: {
+          opacity: 0,
+        },
+        config: {
+          duration: 2000,
+        },
+        onResolve: () => {
+          setFirstInput(true);
+        },
+      });
+      api2.start({
+        delay: 100,
+
+        from: {
+          opacity: 1,
+        },
+        to: {
+          opacity: 0,
+        },
+        config: {
+          duration: 2000,
+        },
+        onResolve: () => {
+          // setInputHeaderText('"' + inputStore + '"');
+          setInputHeaderText(inputStore);
+        },
+      });
+      api2.start({
+        delay: 2000,
+
+        from: {
+          opacity: 0,
+        },
+        to: {
+          opacity: 1,
+        },
+        config: {
+          duration: 2000,
+        },
+      });
+      api3.start({
+        delay: 0,
+
+        from: {
+          opacity: 1,
+        },
+        to: {
+          opacity: 0,
+        },
+        config: {
+          duration: 1000,
+        },
+      });
+      api4.start({
+        delay: 1500,
+
+        from: {
+          opacity: 0,
+        },
+        to: {
+          opacity: 1,
+        },
+        config: {
+          duration: 1500,
+        },
+      });
+
+      generateResponse2(inputStore);
+    }
+  }, [inputStore]);
+
+  const [springs, api] = useSpring(() => ({
+    from: { opacity: 0 },
+  }));
+  const [springs2, api2] = useSpring(() => ({
+    from: { opacity: 0 },
+  }));
+  const [springs3, api3] = useSpring(() => ({
+    from: { opacity: 1 },
+  }));
+  const [springs4, api4] = useSpring(() => ({
+    from: { opacity: 1 },
+  }));
+
+  useEffect(() => {
+    api.start({
+      delay: 1000,
+
+      from: {
+        opacity: 0,
+      },
+      to: {
+        opacity: 1,
+      },
+      config: {
+        duration: 7000,
+      },
+    });
+  }, []);
+  const [loading, setLoading] = useState(false);
+
   return (
     <>
-      {/* <audio ref={audioRef} /> */}
-      {/* {audioRefs.current.map((audioRef, index) => (
-        <audio key={index} ref={audioRef} />
-      ))} */}
+      {/* <CenterMantine> */}
+      <Image
+        sx={{
+          position: "absolute",
+          zIndex: 1,
+          bottom: 0,
+          // left: 0,
+          margin: "2rem",
+          opacity: 0.3,
+          // padding: "2rem",
+          // width: "100%",
+        }}
+        // pr={"xl"}
+        src={"/wordmark.png"}
+        width={60}
+      />
+      {/* </CenterMantine> */}
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 1,
+          bottom: 0,
+          right: 0,
+          padding: "1rem",
+        }}
+      >
+        <ActionIcon color={"dark"} variant="transparent">
+          {/* <GrCircleQuestion
+              color="white"
+              fill="white"
+              style={{ color: "white", fill: "white" }}
+            /> */}
+          <VscQuestion
+            onMouseOver={({ target }) => (target.style.opacity = 1)}
+            onMouseOut={({ target }) => (target.style.opacity = 0.5)}
+            size={25}
+            style={{ opacity: 0.5, fill: "white" }}
+          />
+        </ActionIcon>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 1,
+          padding: "1rem",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <CenterMantine>
+          <Stack mt={70}>
+            {firstInput ? (
+              <Container>
+                <animated.div style={springs2}>
+                  <Text className="theHeaderInput">{inputHeaderText}</Text>
+                </animated.div>
+              </Container>
+            ) : (
+              <animated.div style={springs}>
+                <TypeIt
+                  className="theHeader"
+                  options={{
+                    afterComplete: () => {
+                      document.querySelector(".ti-cursor").style.display =
+                        "none";
+                    },
+                  }}
+                >
+                  How do you feel right now?
+                </TypeIt>
+              </animated.div>
+            )}
+            <Container mt={70}>
+              {loading ? (
+                <animated.div style={springs4}>
+                  <PulseLoader
+                    color={"#53504A"}
+                    loading={true}
+                    size={10}
+                    speedMultiplier={0.5}
+                  />
+                </animated.div>
+              ) : (
+                <animated.div style={springs3}>
+                  {typeIts.map((typeIt, index) => {
+                    if (index === typeIts.length - 1) {
+                      return <div key={index}>{typeIt}</div>;
+                    }
+                  })}
+                </animated.div>
+              )}
+            </Container>
+          </Stack>
+        </CenterMantine>
+      </div>
       <AudioController />
-
       <div
         style={{
           position: "absolute",
@@ -238,7 +500,7 @@ function App() {
           <TextInput
             mt={200}
             label="How are you feeling?"
-            classNames={classes}
+            // classNames={classes}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             // onKeyPress={handleKeyPress}
@@ -276,7 +538,6 @@ function App() {
         </Stack>
         {/* </Center> */}
       </div>
-
       {/* <Canvas eventPrefix="client" shadows camera={{ position: [1, 0, 0] }}> */}
       <Canvas
         shadows
@@ -357,6 +618,7 @@ function App() {
         {/* <Rig /> */}
         <group position={[0.2, -1.5, 0]}>
           <Sphere2
+            // enterIncrement={enterIncrement}
             firstClick={firstClick}
             colorOne={colorOne}
             colorTwo={colorTwo}
@@ -365,20 +627,21 @@ function App() {
             colorFive={colorFive}
           />
         </group>
-        <Env />
+        <Env enterIncrement={enterIncrement} />
         {/* <OrbitControls enablePan={false} enableZoom={false} /> */}
         <OrbitControls
-          // enabled={false}
+          enabled={false}
           // autoRotate
-          // autoRotateSpeed={2}
+          // autoRotateSpeed={0.5}
+          // enableRotate={false}
           // enablePan={false}
           // enableZoom={false}
-          minPolarAngle={Math.PI / 2.1}
-          maxPolarAngle={Math.PI / 2.1}
+          // minPolarAngle={Math.PI / 2.1}
+          // maxPolarAngle={Math.PI / 2.1}
           // minPolarAngle={Math.PI / 3.1}
           // maxPolarAngle={Math.PI / 2.1}
         />
-        {/* <group scale={0.5}>
+        {/* <group>
           <Particles />
         </group> */}
       </Canvas>
@@ -386,8 +649,92 @@ function App() {
   );
 }
 
-function Env() {
+function Env(props) {
   const [preset, setPreset] = useState("sunset");
+  let vec = new THREE.Vector3();
+  let enterIncrement = 0;
+  useFrame((state) => {
+    enterIncrement = props.enterIncrement % 13;
+
+    // console.log(state.camera.position);
+    // console.log(state.camera);
+    // {x: -6.0358791643389145, y: 3.028888268496038, z: 6.405432772282838}
+    // {x: 5.248097238306234, y: 2.5015889415213106, z: 5.4666839498488295}
+    // {x: 0, y: 4.332061055971331, z: 6.700236003219422}
+    // {x: 0, y: -0.902270925328769, z: 7.929117645891684}
+    // {x: 0, y: 2.522576945620514e-15, z: 41.19680788578111}
+    // x: 10.830953118825398;
+    // y: 0.6206651180632762;
+    // z: -0.40251601096885026;
+    if (enterIncrement === 2) {
+      state.camera.position.lerp(vec.set(0, 0, 15), 0.01);
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 3) {
+      state.camera.position.lerp(vec.set(15, 0, 15), 0.01);
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 4) {
+      state.camera.position.lerp(vec.set(-15, 0, 15), 0.01);
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 5) {
+      state.camera.position.lerp(
+        vec.set(-6.0358791643389145, 3.028888268496038, 6.405432772282838),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 6) {
+      state.camera.position.lerp(
+        vec.set(5.248097238306234, 2.5015889415213106, 5.4666839498488295),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 7) {
+      state.camera.position.lerp(
+        vec.set(0, 4.332061055971331, 6.700236003219422),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 8) {
+      state.camera.position.lerp(
+        vec.set(0, -0.902270925328769, 7.929117645891684),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 9) {
+      state.camera.position.lerp(
+        vec.set(0, 2.522576945620514e-15, 41.19680788578111),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 10) {
+      state.camera.position.lerp(
+        vec.set(10.830953118825398, 0.6206651180632762, -0.40251601096885026),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 11) {
+      state.camera.position.lerp(
+        vec.set(0, -0.902270925328769, 7.929117645891684),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+    if (enterIncrement === 12) {
+      state.camera.position.lerp(
+        vec.set(-10.830953118825398, 0.6206651180632762, -0.40251601096885026),
+        0.01
+      );
+      state.camera.lookAt(0, 0, 0);
+    }
+  });
   // You can use the "inTransition" boolean to react to the loading in-between state,
   // For instance by showing a message
   // const [inTransition, startTransition] = useTransition();
@@ -422,30 +769,55 @@ function Sphere2(props) {
 
   const randomLight = useRef();
   let x = 0;
+  // const { camera } = useThree();
+
+  // useEffect(() => {
+  //   if (enterIncrement === 2) {
+  //     gsap.to(camera.position, {
+  //       z: 20,
+  //       duration: 3,
+  //       ease: "power1.out",
+  //     });
+  //   }
+  // }, [enterIncrement]);
+  // useFrame((state, delta) => {
+  //   // if (enterIncrement === 2) {
+  //   //   gsap.to(state.camera.position, {
+  //   //     z: 20,
+  //   //     duration: 3,
+  //   //     ease: "power1.out",
+  //   //   });
+  //   // }
+
+  // });
+
   // useFrame((state, delta) => {
   //   x += delta;
   //   // console.log(randomLight.current);
   //   randomLight.current.position.x = Math.sin(x);
   // });
 
-  const { camera } = useThree();
-  const moveCamera = () => {
-    gsap.to(camera.position, {
-      // x: -8,
-      z: -20,
-      duration: 3,
-      ease: "power1.out",
-    });
-  };
-  // useFrame(() => {
-  //   // camera.lookAt(0, 0, 0);
+  // const moveCamera = () => {
+  //   gsap.to(camera.position, {
+  //     // x: -8,
+  //     z: -20,
+  //     duration: 3,
+  //     ease: "power1.out",
+  //   });
+  // };
+  // let y = 0;
+  // useFrame((state, delta) => {
+  //   x += delta / 4;
+  //   y += delta /2;
+  //   camera.position.x = Math.sin(x) * 5;
+  //   camera.position.z = Math.cos(y) * 3 + 3;
   // });
 
   return (
     <>
       <AccumulativeShadows
-        temporal
-        frames={200}
+        // temporal
+        frames={100}
         color="purple"
         colorBlend={0.5}
         opacity={1}
@@ -463,6 +835,7 @@ function Sphere2(props) {
           />
         </group>
       </AccumulativeShadows>
+
       <group scale={20}>
         <GradientTwo
           firstClick={props.firstClick}
@@ -477,7 +850,7 @@ function Sphere2(props) {
           colorFive={props.colorFive}
         />
       </group>
-      <group onClick={() => moveCamera()}>
+      <group>
         <GradientTwo
           shape={"statue"}
           opacity={1}
@@ -617,6 +990,7 @@ function Postpro() {
           uniforms-time-value={0}
           renderToScreen
         />
+
         {/* <shaderPass
           args={[Infinite]}
           // uniforms-tDiffuse-value={occlusionRenderTarget.texture}
@@ -705,16 +1079,5 @@ function Sphere(props) {
 //     </group>
 //   );
 // }
-
-const Main = styled.main`
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: 100%;
-  @media only screen and (max-width: 1200px) {
-    flex-direction: column;
-  }
-`;
 
 export default App;

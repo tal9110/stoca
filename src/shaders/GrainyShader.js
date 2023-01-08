@@ -27,5 +27,22 @@ export const GrainyShader = {
         color = texture2D(tDiffuse, vec2(vUv.x + cos(angle) * offset, vUv.y + sin(angle) * offset));
       }
       gl_FragColor = color;
-                  }`,
+                  }
+  
+    
+  
+// uniform sampler2D tDiffuse;
+// uniform float time;
+// uniform vec2 uResolution;
+// varying vec2 vUv;
+
+// void main() {
+//   vec2 uv = vUv;
+//   uv.y += sin(uv.x * 10.0 + time * 1.0) * 0.001;
+//   uv.y += sin(uv.x * 15.0 + time * 1.5) * 0.001;
+//   uv.y += sin(uv.x * 25.0 + time * 2.0) * 0.001;
+//   uv.y += sin(uv.x * 50.0 + time * 2.5) * 0.001;
+//   gl_FragColor = texture2D(tDiffuse, uv);
+// }
+                  `,
 };

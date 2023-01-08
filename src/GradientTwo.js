@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { RGBELoader } from "three-stdlib";
+import { Sparkles } from "@react-three/drei";
 
 import * as THREE from "three";
 import {
@@ -9,6 +10,7 @@ import {
   ScreenQuad,
   shaderMaterial,
   Stars,
+  Trail,
 } from "@react-three/drei";
 import { extend, useFrame, useLoader, useThree } from "@react-three/fiber";
 import gsap from "gsap";
@@ -236,7 +238,7 @@ export default function GradientTwo(props) {
   useEffect(() => {
     if (props.firstClick === 1) {
       gsap.to(gradientRef.current.material.uniforms.opacity, {
-        value: 0.5,
+        value: 0.09,
         duration: 6,
         ease: "power1.out",
       });
@@ -244,6 +246,7 @@ export default function GradientTwo(props) {
   }, [props.firstClick]);
 
   useEffect(() => {
+    // console.log(props);
     // console.log(props.colorOne);
     // console.log(props.colorTwo);
     let threeColorOne = new THREE.Color(props.colorOne);
@@ -258,87 +261,91 @@ export default function GradientTwo(props) {
       threeColorFour,
       threeColorFive,
     ]);
-    gsap.to(colors[0], {
-      r: threeColorOne.r,
-      g: threeColorOne.g,
-      b: threeColorOne.b,
-      duration: 3,
-      ease: "power1.inOut",
-      onUpdate: function () {
-        // Update the uniforms with the new color values
-        gradientRef.current.material.uniforms.uColor.value[0].setRGB(
-          colors[0].r,
-          colors[0].g,
-          colors[0].b
-        );
-      },
-    });
-    gsap.to(colors[1], {
-      r: threeColorTwo.r,
-      g: threeColorTwo.g,
-      b: threeColorTwo.b,
-      duration: 3,
-      ease: "power1.inOut",
-      onUpdate: function () {
-        // Update the uniforms with the new color values
-        gradientRef.current.material.uniforms.uColor.value[1].setRGB(
-          colors[1].r,
-          colors[1].g,
-          colors[1].b
-        );
-      },
-    });
-    gsap.to(colors[2], {
-      r: threeColorThree.r,
-      g: threeColorThree.g,
-      b: threeColorThree.b,
-      duration: 3,
-      ease: "power1.inOut",
-      onUpdate: function () {
-        // Update the uniforms with the new color values
-        gradientRef.current.material.uniforms.uColor.value[2].setRGB(
-          colors[2].r,
-          colors[2].g,
-          colors[2].b
-        );
-      },
-    });
-    gsap.to(colors[3], {
-      r: threeColorFour.r,
-      g: threeColorFour.g,
-      b: threeColorFour.b,
-      duration: 3,
-      ease: "power1.inOut",
-      onUpdate: function () {
-        // Update the uniforms with the new color values
-        gradientRef.current.material.uniforms.uColor.value[3].setRGB(
-          colors[3].r,
-          colors[3].g,
-          colors[3].b
-        );
-      },
-    });
-    gsap.to(colors[4], {
-      r: threeColorFive.r,
-      g: threeColorFive.g,
-      b: threeColorFive.b,
-      duration: 3,
-      ease: "power1.inOut",
-      onUpdate: function () {
-        // Update the uniforms with the new color values
-        gradientRef.current.material.uniforms.uColor.value[4].setRGB(
-          colors[4].r,
-          colors[4].g,
-          colors[4].b
-        );
-      },
-    });
-    // gsap.to(gradientRef.current.material.uniforms.time, {
-    //   value: 5,
-    //   duration: 2,
-    //   ease: "power1.inOut",
-    // });
-  }, [props]);
+    if (props.shape === "sphere") {
+      gsap.to(colors[0], {
+        r: threeColorOne.r,
+        g: threeColorOne.g,
+        b: threeColorOne.b,
+        duration: 2.5,
+        ease: "power1.inOut",
+        onUpdate: function () {
+          // Update the uniforms with the new color values
+          gradientRef.current.material.uniforms.uColor.value[0].setRGB(
+            colors[0].r,
+            colors[0].g,
+            colors[0].b
+          );
+        },
+      });
+      gsap.to(colors[1], {
+        r: threeColorTwo.r,
+        g: threeColorTwo.g,
+        b: threeColorTwo.b,
+        duration: 2.5,
+        ease: "power1.inOut",
+        onUpdate: function () {
+          // Update the uniforms with the new color values
+          gradientRef.current.material.uniforms.uColor.value[1].setRGB(
+            colors[1].r,
+            colors[1].g,
+            colors[1].b
+          );
+        },
+      });
+      gsap.to(colors[2], {
+        r: threeColorThree.r,
+        g: threeColorThree.g,
+        b: threeColorThree.b,
+        duration: 2.5,
+        ease: "power1.inOut",
+        onUpdate: function () {
+          // Update the uniforms with the new color values
+          gradientRef.current.material.uniforms.uColor.value[2].setRGB(
+            colors[2].r,
+            colors[2].g,
+            colors[2].b
+          );
+        },
+      });
+      gsap.to(colors[3], {
+        r: threeColorFour.r,
+        g: threeColorFour.g,
+        b: threeColorFour.b,
+        duration: 2.5,
+        ease: "power1.inOut",
+        onUpdate: function () {
+          // Update the uniforms with the new color values
+          gradientRef.current.material.uniforms.uColor.value[3].setRGB(
+            colors[3].r,
+            colors[3].g,
+            colors[3].b
+          );
+        },
+      });
+      gsap.to(colors[4], {
+        r: threeColorFive.r,
+        g: threeColorFive.g,
+        b: threeColorFive.b,
+        duration: 2.5,
+        ease: "power1.inOut",
+        onUpdate: function () {
+          // Update the uniforms with the new color values
+          gradientRef.current.material.uniforms.uColor.value[4].setRGB(
+            colors[4].r,
+            colors[4].g,
+            colors[4].b
+          );
+        },
+      });
+    }
+  }, [
+    props.colorOne,
+    props.colorTwo,
+    props.colorThree,
+    props.colorFour,
+    props.colorFive,
+    props.shape,
+  ]);
 
   // const animateColors = (newColors) => {
   //   TweenMax.to(colors[0], 2, {
@@ -370,7 +377,7 @@ export default function GradientTwo(props) {
     y += delta / 5;
     if (props.shape === "sphere") {
       gradientRef.current.material.uniforms.time.value += delta / 40;
-      // gradientRef.current.material.uniforms.opacity.value = 0.5;
+      // gradientRef.current.material.uniforms.opacity.value = 1;
     }
     // console.log(statueRef);
     // easing.damp3(
@@ -400,6 +407,10 @@ export default function GradientTwo(props) {
 
   return (
     <>
+      {/* <group position={[0, 5, 0]}>
+        <Sparkles count={50} scale={10} size={2} speed={0.4} />
+      </group> */}
+
       <pointLight ref={pointRef} intensity={1} position={[0, 0, -5]} />
       <spotLight
         angle={0.5}
@@ -465,6 +476,7 @@ export default function GradientTwo(props) {
               transmission={0.99}
               opacity={0}
             />
+
             {/* <MeshTransmissionMaterial
               samples={5}
               clearcoat={1}
