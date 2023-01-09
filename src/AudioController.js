@@ -22,7 +22,7 @@ export default function AudioController() {
   const [entered, setEntered] = useState(false);
   const keySound = new Howl({
     src: [`/audio/${currentNote}.mp3`],
-    volume: 0.3,
+    volume: 0.4,
   });
   const enterSound = new Howl({
     src: [`/audio/enter.mp3`],

@@ -574,6 +574,7 @@ function App() {
 
           <ActionIcon color={"dark"} variant="transparent">
             <VscQuestion
+              // onClick={() => setAbout(!about)}
               className="questionIcon"
               size={25}
               style={{ fill: "white" }}
@@ -814,16 +815,6 @@ function Env(props) {
   useFrame((state) => {
     enterIncrement = props.enterIncrement % 13;
 
-    // console.log(state.camera.position);
-    // console.log(state.camera);
-    // {x: -6.0358791643389145, y: 3.028888268496038, z: 6.405432772282838}
-    // {x: 5.248097238306234, y: 2.5015889415213106, z: 5.4666839498488295}
-    // {x: 0, y: 4.332061055971331, z: 6.700236003219422}
-    // {x: 0, y: -0.902270925328769, z: 7.929117645891684}
-    // {x: 0, y: 2.522576945620514e-15, z: 41.19680788578111}
-    // x: 10.830953118825398;
-    // y: 0.6206651180632762;
-    // z: -0.40251601096885026;
     if (enterIncrement === 2) {
       state.camera.position.lerp(vec.set(0, 3, 15), 0.01);
       state.camera.lookAt(0, 0, 0);
