@@ -20,8 +20,10 @@ import Loader from "react-loaders";
 import { PulseLoader } from "react-spinners";
 import { GrCircleQuestion } from "react-icons/gr";
 import { IconContext } from "react-icons";
-import { VscQuestion } from "react-icons/vsc";
+import { VscQuestion, VscRefresh, VscMute, VscUnmute } from "react-icons/vsc";
 import { useHover } from "@mantine/hooks";
+import ReactHowler from "react-howler";
+import { Modal } from "@mantine/core";
 
 import Mantine from "./Mantine/Mantine";
 import gsap from "gsap";
@@ -66,6 +68,7 @@ import { HiOutlineArrowSmRight } from "react-icons/hi";
 import { BsArrowRightShort } from "react-icons/bs";
 import { Fog } from "three";
 import AudioController from "./AudioController";
+import AudioController2 from "./AudioController2";
 
 extend({ WaterPass, GlitchPass, AfterimagePass });
 
@@ -253,60 +256,50 @@ function App() {
   // const generateResponse3 = (inputt) => {
   //   setAiOutput(inputt);
   // };
-  const padC = new Howl({
-    src: [`/audio/padC.mp3`],
-    volume: 0,
-    loop: true,
-  });
-  const padD = new Howl({
-    src: [`/audio/padD.mp3`],
-    volume: 0,
-    loop: true,
-  });
-  const padF = new Howl({
-    src: [`/audio/padF.mp3`],
-    volume: 0,
-    loop: true,
-  });
-  const casette = new Howl({
-    src: [`/audio/casette.mp3`],
-    volume: 0,
-    loop: true,
-  });
-  const arpC = new Howl({
-    src: [`/audio/arpC.mp3`],
-    volume: 0.5,
-    loop: true,
-  });
-  const arpF = new Howl({
-    src: [`/audio/arpF.mp3`],
-    volume: 0,
-    loop: true,
-  });
+  // const padC = new Howl({
+  //   src: [`/audio/padC.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const padD = new Howl({
+  //   src: [`/audio/padD.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const padF = new Howl({
+  //   src: [`/audio/padF.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const casette = new Howl({
+  //   src: [`/audio/casette.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const arpC = new Howl({
+  //   src: [`/audio/arpC.mp3`],
+  //   volume: 0.5,
+  //   loop: true,
+  // });
+  // const arpF = new Howl({
+  //   src: [`/audio/arpF.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
 
-  let padCRef;
-  let padDRef;
+  // let padCRef;
+  // let padDRef;
 
-  useEffect(() => {
-    padF.play();
-    padD.play();
-    arpF.play();
-    arpC.play();
-    casette.play();
-    casette.fade(0, 0.5, 5000);
-    padCRef = padC.play();
-    padC.fade(0, 0.5, 15000);
-  }, []);
-
-  useEffect(() => {
-    if (word === "optimistic") {
-    }
-    if (word === "pessimistic") {
-      console.log("should have worked");
-      padC.fade(0.5, 0, 1000);
-      // padD.fade(0, 0.5, 3000);
-    }
-  }, [word]);
+  // useEffect(() => {
+  //   padF.play();
+  //   padD.play();
+  //   arpF.play();
+  //   arpC.play();
+  //   casette.play();
+  //   casette.fade(0, 0.5, 5000);
+  //   padCRef = padC.play();
+  //   padC.fade(0, 0.5, 15000);
+  // }, []);
 
   const inputStore = useStore((state) => state.inputStore);
   // const step = useStore((state) => state.step);
@@ -448,9 +441,99 @@ function App() {
   }, []);
   const [loading, setLoading] = useState(false);
 
+  // useEffect(() => {
+  //   if (word === "optimistic") {
+  //     gsap.to(padCVolume, {
+  //       volume: 0.5,
+  //       duration: 5,
+  //       onUpdate: () => setPadCVolume({ volume: padCVolume.volume }),
+  //     });
+  //   }
+  //   if (word === "pessimistic") {
+  //   }
+  // }, [word]);
+  // const [padCPlaying, setPadCPlaying] = useState(true);
+  // const [padDPlaying, setPadDPlaying] = useState(false);
+  // const [padFPlaying, setPadFPlaying] = useState(false);
+  // const [casettePlaying, setCasettePlaying] = useState(true);
+  // const [arpCPlaying, setArpCPlaying] = useState(true);
+  // const [arpFPlaying, setArpFPlaying] = useState(false);
+  // const [padCVolume, setPadCVolume] = useState({ volume: 0 });
+  // const [padDVolume, setPadDVolume] = useState(0);
+  // const [padFVolume, setPadFVolume] = useState(0);
+  // const [casetteVolume, setCasetteVolume] = useState(0);
+  // const [arpCVolume, setArpCVolume] = useState(0.5);
+  // const [arpFVolume, setArpFVolume] = useState(0);
+  // const padC = new Howl({
+  //   src: [`/audio/padC.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const padD = new Howl({
+  //   src: [`/audio/padD.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const padF = new Howl({
+  //   src: [`/audio/padF.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const casette = new Howl({
+  //   src: [`/audio/casette.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+  // const arpC = new Howl({
+  //   src: [`/audio/arpC.mp3`],
+  //   volume: 0.5,
+  //   loop: true,
+  // });
+  // const arpF = new Howl({
+  //   src: [`/audio/arpF.mp3`],
+  //   volume: 0,
+  //   loop: true,
+  // });
+
   return (
     <>
-      {/* <CenterMantine> */}
+      <AudioController2 word={word} />
+      {/* <ReactHowler
+        src="/audio/padC.mp3"
+        playing={padCPlaying}
+        volume={padCVolume.volume}
+        loop={true}
+      />
+      <ReactHowler
+        src="/audio/padD.mp3"
+        playing={padDPlaying}
+        volume={padDVolume}
+        loop={true}
+      />
+      <ReactHowler
+        src={"/audio/padF.mp3"}
+        playing={padFPlaying}
+        volume={padFVolume}
+        loop={true}
+      />
+      <ReactHowler
+        src={"/audio/casette.mp3"}
+        playing={casettePlaying}
+        volume={casetteVolume}
+        loop={true}
+      />
+      <ReactHowler
+        src={"/audio/arpC.mp3"}
+        playing={arpCPlaying}
+        volume={arpCVolume}
+        loop={true}
+      />
+      <ReactHowler
+        src={"/audio/arpF.mp3"}
+        playing={arpFPlaying}
+        volume={arpFVolume}
+        loop={true}
+      /> */}
 
       <Image
         className="wordmark"
@@ -480,20 +563,23 @@ function App() {
           padding: "1rem",
         }}
       >
-        <ActionIcon color={"dark"} variant="transparent">
-          {/* <GrCircleQuestion
-              color="white"
-              fill="white"
-              style={{ color: "white", fill: "white" }}
-            /> */}
-          <VscQuestion
-            className="questionIcon"
-            // onMouseOver={({ target }) => (target.style.opacity = 1)}
-            // onMouseOut={({ target }) => (target.style.opacity = 0.5)}
-            size={25}
-            style={{ fill: "white" }}
-          />
-        </ActionIcon>
+        <Group>
+          {/* <ActionIcon color={"dark"} variant="transparent">
+            <VscRefresh
+              className="questionIcon"
+              size={25}
+              style={{ fill: "white" }}
+            />
+          </ActionIcon> */}
+
+          <ActionIcon color={"dark"} variant="transparent">
+            <VscQuestion
+              className="questionIcon"
+              size={25}
+              style={{ fill: "white" }}
+            />
+          </ActionIcon>
+        </Group>
       </div>
       <div
         style={{
@@ -701,18 +787,18 @@ function App() {
         </group>
         <Env enterIncrement={enterIncrement} />
         {/* <OrbitControls enablePan={false} enableZoom={false} /> */}
-        <OrbitControls
-          enabled={false}
-          // autoRotate
-          // autoRotateSpeed={0.5}
-          // enableRotate={false}
-          // enablePan={false}
-          // enableZoom={false}
-          // minPolarAngle={Math.PI / 2.1}
-          // maxPolarAngle={Math.PI / 2.1}
-          // minPolarAngle={Math.PI / 3.1}
-          // maxPolarAngle={Math.PI / 2.1}
-        />
+        {/* <OrbitControls
+        // enabled={false}
+        // autoRotate
+        // autoRotateSpeed={0.5}
+        // enableRotate={false}
+        // enablePan={false}
+        // enableZoom={false}
+        // minPolarAngle={Math.PI / 2.1}
+        // maxPolarAngle={Math.PI / 2.1}
+        // minPolarAngle={Math.PI / 3.1}
+        // maxPolarAngle={Math.PI / 2.1}
+        /> */}
         {/* <group>
           <Particles />
         </group> */}

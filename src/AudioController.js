@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Howl, Howler } from "howler";
@@ -10,6 +10,7 @@ import { useSpring, animated } from "@react-spring/web";
 import gsap from "gsap";
 import { logDOM } from "@testing-library/react";
 import { Image } from "@mantine/core";
+import ReactHowler from "react-howler";
 
 export default function AudioController() {
   // const step = useStore((state) => state.step);
@@ -21,18 +22,22 @@ export default function AudioController() {
   const [entered, setEntered] = useState(false);
   const keySound = new Howl({
     src: [`/audio/${currentNote}.mp3`],
-    volume: 0.5,
+    volume: 0.3,
   });
   const enterSound = new Howl({
     src: [`/audio/enter.mp3`],
-    volume: 1,
+    volume: 0.5,
   });
-
+  // const keySound = useRef();
+  // const enterSound = useRef();
+  // const [keySoundVolume, setKeySoundVolume] = useState(0.5);
+  // const [keySoundPlaying, setKeySoundPlaying] = useState(false);
   const handleKeyPress = (event) => {
     if (event.key === " ") {
       setPlaying(true);
     } else if (playing) {
       keySound.play();
+      // setKeySoundPlaying(true);
       setCurrentNote((currentNote + 1) % 22);
       setPlaying(false);
     }
@@ -127,6 +132,19 @@ export default function AudioController() {
 
   return (
     <>
+      {/* <ReactHowler
+        // src="/audio/1.mp3"
+        // volume={keySoundVolume}
+        playing={keySoundPlaying}
+        // ref={keySound}
+      />
+      <ReactHowler
+        src="/audio/enter.mp3"
+        volume={1}
+        playing={false}
+        ref={enterSound}
+      /> */}
+
       <div
         style={{
           visibility: "hidden",
