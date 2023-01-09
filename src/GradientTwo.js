@@ -23,9 +23,6 @@ import { easing } from "maath";
 
 // import useRef from "react";
 
-const hundredColors = require("./hundredColors.json");
-let firstPalette = hundredColors[21];
-firstPalette = firstPalette.map((color) => new THREE.Color(color));
 const newPalette = [
   new THREE.Color("#FFFFFF"),
   new THREE.Color("#000000"),
@@ -238,7 +235,7 @@ export default function GradientTwo(props) {
   useEffect(() => {
     if (props.firstClick === 1) {
       gsap.to(gradientRef.current.material.uniforms.opacity, {
-        value: 0.09,
+        value: 0.1,
         duration: 6,
         ease: "power1.out",
       });

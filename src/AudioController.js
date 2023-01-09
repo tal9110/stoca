@@ -19,20 +19,25 @@ export default function AudioController() {
   const [playing, setPlaying] = useState(false);
   const [currentNote, setCurrentNote] = useState(0);
   const [entered, setEntered] = useState(false);
+  const keySound = new Howl({
+    src: [`/audio/${currentNote}.mp3`],
+    volume: 0.5,
+  });
+  const enterSound = new Howl({
+    src: [`/audio/enter.mp3`],
+    volume: 1,
+  });
 
   const handleKeyPress = (event) => {
     if (event.key === " ") {
       setPlaying(true);
     } else if (playing) {
-      const sound = new Howl({
-        src: [`/audio/${currentNote}.mp3`],
-        volume: 0.75,
-      });
-      sound.play();
+      keySound.play();
       setCurrentNote((currentNote + 1) % 22);
       setPlaying(false);
     }
     if (event.key === "Enter") {
+      enterSound.play();
       setEntered(true);
     }
   };
@@ -164,11 +169,10 @@ export default function AudioController() {
           style={{
             // caretColor: "#53504A",
             caretColor: "white",
-
             fontSize: 35,
             textAlign: "center",
-            width: "1200px",
-            height: "100px",
+            width: "1000px",
+            height: "70px",
             bottom: 80,
             position: "absolute",
             zIndex: 1,

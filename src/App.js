@@ -21,6 +21,7 @@ import { PulseLoader } from "react-spinners";
 import { GrCircleQuestion } from "react-icons/gr";
 import { IconContext } from "react-icons";
 import { VscQuestion } from "react-icons/vsc";
+import { useHover } from "@mantine/hooks";
 
 import Mantine from "./Mantine/Mantine";
 import gsap from "gsap";
@@ -60,9 +61,6 @@ import {
   Center,
   Edges,
 } from "@react-three/drei";
-import { ControlledInput } from "./ControlledInput";
-import Gradient from "./Gradient";
-import { StripeGradient } from "./StripeGradient";
 import GradientTwo from "./GradientTwo";
 import { HiOutlineArrowSmRight } from "react-icons/hi";
 import { BsArrowRightShort } from "react-icons/bs";
@@ -115,7 +113,7 @@ function App() {
   const [finalPrompt, setFinalPrompt] = useState(
     // "The following is a conversation with an AI therapist. The therapist is helpful, creative, clever, very friendly, not shy of digging deeper, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
     // "The following is a conversation with an AI therapist. The therapist is stoic, helpful, creative, clever, very friendly, gives a piece of wisdom, and asks a follow up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
-    "The following is a conversation with an AI Stoic Philosopher. The philosopher is helpful, creative, clever, very friendly, and always asks a follow-up question.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
+    "The following is a conversation with an AI Stoic Philosopher. The philosopher is helpful, creative, clever, friendly, gives brief stoic advice, and asks deep questions.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
   );
   const [inputValue, setInputValue] = useState("");
   const [firstClick, setFirstClick] = useState(0);
@@ -136,7 +134,7 @@ function App() {
       model: "text-davinci-003",
       prompt: combined,
       temperature: 0.9,
-      max_tokens: 350,
+      max_tokens: 300,
       top_p: 1,
       frequency_penalty: 0.76,
       presence_penalty: 0.75,
@@ -147,7 +145,7 @@ function App() {
       prompt:
         "Five different hex value colors that are a color palette for " +
         inputt +
-        " , and then on a new line describe the overall palette as either light or dark: \n\n",
+        " , and then on a new line describe that sentiment as either optimistic or pessimistic: \n\n",
       temperature: 0,
       max_tokens: 64,
       top_p: 1.0,
@@ -211,13 +209,19 @@ function App() {
     setColorFour("#" + split[3].slice(0, 6));
     setColorFive("#" + split[4].slice(0, 6));
     // console.log("#" + split[0].slice(0, 6));
-    if (split[4].trim().includes("Light")) {
-      setWord("light");
-      console.log("light success");
+    if (
+      split[4].trim().includes("Optimistic") ||
+      split[4].trim().includes("optimistic")
+    ) {
+      setWord("optimistic");
+      console.log("optimistic success");
     }
-    if (split[4].trim().includes("Dark")) {
-      setWord("dark");
-      console.log("dark success");
+    if (
+      split[4].trim().includes("Pessimistic") ||
+      split[4].trim().includes("pessimistic")
+    ) {
+      setWord("pessimistic");
+      console.log("pessimistic success");
     }
     // console.log(response.data.choices[0].text);
     const appended = combined + response.data.choices[0].text;
@@ -240,7 +244,7 @@ function App() {
         {aiOutput}
       </TypeIt>
     );
-    console.log(typeIts);
+    // console.log(typeIts);
 
     setTypeIts([...typeIts, newTypeIt]);
     // console.log(typeIts);
@@ -249,15 +253,60 @@ function App() {
   // const generateResponse3 = (inputt) => {
   //   setAiOutput(inputt);
   // };
+  const padC = new Howl({
+    src: [`/audio/padC.mp3`],
+    volume: 0,
+    loop: true,
+  });
+  const padD = new Howl({
+    src: [`/audio/padD.mp3`],
+    volume: 0,
+    loop: true,
+  });
+  const padF = new Howl({
+    src: [`/audio/padF.mp3`],
+    volume: 0,
+    loop: true,
+  });
+  const casette = new Howl({
+    src: [`/audio/casette.mp3`],
+    volume: 0,
+    loop: true,
+  });
+  const arpC = new Howl({
+    src: [`/audio/arpC.mp3`],
+    volume: 0.5,
+    loop: true,
+  });
+  const arpF = new Howl({
+    src: [`/audio/arpF.mp3`],
+    volume: 0,
+    loop: true,
+  });
+
+  let padCRef;
+  let padDRef;
 
   useEffect(() => {
-    const sound = new Howl({
-      src: [`/audio/bed.mp3`],
-      volume: 0.5,
-      loop: true,
-    });
-    sound.play();
+    padF.play();
+    padD.play();
+    arpF.play();
+    arpC.play();
+    casette.play();
+    casette.fade(0, 0.5, 5000);
+    padCRef = padC.play();
+    padC.fade(0, 0.5, 15000);
   }, []);
+
+  useEffect(() => {
+    if (word === "optimistic") {
+    }
+    if (word === "pessimistic") {
+      console.log("should have worked");
+      padC.fade(0.5, 0, 1000);
+      // padD.fade(0, 0.5, 3000);
+    }
+  }, [word]);
 
   const inputStore = useStore((state) => state.inputStore);
   // const step = useStore((state) => state.step);
@@ -365,6 +414,9 @@ function App() {
   const [springs4, api4] = useSpring(() => ({
     from: { opacity: 1 },
   }));
+  const [springs5, api5] = useSpring(() => ({
+    from: { opacity: 0 },
+  }));
 
   useEffect(() => {
     api.start({
@@ -380,27 +432,44 @@ function App() {
         duration: 7000,
       },
     });
+    api5.start({
+      delay: 1000,
+
+      from: {
+        opacity: 0,
+      },
+      to: {
+        opacity: 1,
+      },
+      config: {
+        duration: 3000,
+      },
+    });
   }, []);
   const [loading, setLoading] = useState(false);
 
   return (
     <>
       {/* <CenterMantine> */}
+
       <Image
+        className="wordmark"
+        // onMouseOver={({ target }) => (target.style.opacity = 1)}
+        // onMouseOut={({ target }) => (target.style.opacity = 0.5)}
         sx={{
           position: "absolute",
           zIndex: 1,
           bottom: 0,
           // left: 0,
           margin: "2rem",
-          opacity: 0.3,
+          // opacity: 0.3,
           // padding: "2rem",
           // width: "100%",
         }}
         // pr={"xl"}
         src={"/wordmark.png"}
         width={60}
-      />
+      ></Image>
       {/* </CenterMantine> */}
       <div
         style={{
@@ -418,10 +487,11 @@ function App() {
               style={{ color: "white", fill: "white" }}
             /> */}
           <VscQuestion
-            onMouseOver={({ target }) => (target.style.opacity = 1)}
-            onMouseOut={({ target }) => (target.style.opacity = 0.5)}
+            className="questionIcon"
+            // onMouseOver={({ target }) => (target.style.opacity = 1)}
+            // onMouseOut={({ target }) => (target.style.opacity = 0.5)}
             size={25}
-            style={{ opacity: 0.5, fill: "white" }}
+            style={{ fill: "white" }}
           />
         </ActionIcon>
       </div>
@@ -435,7 +505,7 @@ function App() {
         }}
       >
         <CenterMantine>
-          <Stack mt={70}>
+          <Stack mt={60}>
             {firstInput ? (
               <Container>
                 <animated.div style={springs2}>
@@ -457,7 +527,7 @@ function App() {
                 </TypeIt>
               </animated.div>
             )}
-            <Container mt={70}>
+            <Container mt={40}>
               {loading ? (
                 <animated.div style={springs4}>
                   <PulseLoader
@@ -480,7 +550,9 @@ function App() {
           </Stack>
         </CenterMantine>
       </div>
-      <AudioController />
+      <animated.div style={springs5}>
+        <AudioController />
+      </animated.div>
       <div
         style={{
           position: "absolute",
@@ -667,15 +739,15 @@ function Env(props) {
     // y: 0.6206651180632762;
     // z: -0.40251601096885026;
     if (enterIncrement === 2) {
-      state.camera.position.lerp(vec.set(0, 0, 15), 0.01);
+      state.camera.position.lerp(vec.set(0, 3, 15), 0.01);
       state.camera.lookAt(0, 0, 0);
     }
     if (enterIncrement === 3) {
-      state.camera.position.lerp(vec.set(15, 0, 15), 0.01);
+      state.camera.position.lerp(vec.set(15, 0, 12.5), 0.01);
       state.camera.lookAt(0, 0, 0);
     }
     if (enterIncrement === 4) {
-      state.camera.position.lerp(vec.set(-15, 0, 15), 0.01);
+      state.camera.position.lerp(vec.set(-15, 0, 12.5), 0.01);
       state.camera.lookAt(0, 0, 0);
     }
     if (enterIncrement === 5) {
@@ -683,28 +755,28 @@ function Env(props) {
         vec.set(-6.0358791643389145, 3.028888268496038, 6.405432772282838),
         0.01
       );
-      state.camera.lookAt(0, 0, 0);
+      state.camera.lookAt(0, 1, 0);
     }
     if (enterIncrement === 6) {
       state.camera.position.lerp(
         vec.set(5.248097238306234, 2.5015889415213106, 5.4666839498488295),
         0.01
       );
-      state.camera.lookAt(0, 0, 0);
+      state.camera.lookAt(0, 1, 0);
     }
     if (enterIncrement === 7) {
       state.camera.position.lerp(
         vec.set(0, 4.332061055971331, 6.700236003219422),
         0.01
       );
-      state.camera.lookAt(0, 0, 0);
+      state.camera.lookAt(0, 1, 0);
     }
     if (enterIncrement === 8) {
       state.camera.position.lerp(
         vec.set(0, -0.902270925328769, 7.929117645891684),
         0.01
       );
-      state.camera.lookAt(0, 0, 0);
+      state.camera.lookAt(0, 1, 0);
     }
     if (enterIncrement === 9) {
       state.camera.position.lerp(
@@ -718,7 +790,7 @@ function Env(props) {
         vec.set(10.830953118825398, 0.6206651180632762, -0.40251601096885026),
         0.01
       );
-      state.camera.lookAt(0, 0, 0);
+      state.camera.lookAt(0, 1, 0);
     }
     if (enterIncrement === 11) {
       state.camera.position.lerp(
@@ -732,7 +804,7 @@ function Env(props) {
         vec.set(-10.830953118825398, 0.6206651180632762, -0.40251601096885026),
         0.01
       );
-      state.camera.lookAt(0, 0, 0);
+      state.camera.lookAt(0, 1, 0);
     }
   });
   // You can use the "inTransition" boolean to react to the loading in-between state,
@@ -1035,49 +1107,5 @@ function Sphere(props) {
     </Center>
   );
 }
-
-// function Model(props) {
-//   const ref = useRef();
-//   const { scene, materials } = useGLTF(
-//     "https://market-assets.fra1.cdn.digitaloceanspaces.com/market-assets/models/bunny/model.gltf"
-//   );
-//   useFrame((state) => {
-//     console.log(ref);
-//   });
-//   return (
-//     <Clone castShadow receiveShadow object={scene} {...props}>
-//       <meshBasicMaterial color="#000000" />
-//     </Clone>
-//   );
-// }
-
-// function Input(props) {
-//   const [text, set] = useState("a blue sky at dusk...");
-//   return (
-//     <group {...props}>
-//       <Text
-//         position={[-1.2, -0.022, 0]}
-//         anchorX="0px"
-//         font="/Inter-Regular.woff"
-//         fontSize={0.335}
-//         letterSpacing={-0.0}
-//       >
-//         {text}
-//         <meshStandardMaterial color="black" />
-//       </Text>
-//       <mesh position={[0, -0.022, 0]} scale={[5, 0.48, 1]}>
-//         <planeGeometry />
-//         <meshBasicMaterial transparent opacity={0.3} depthWrite={false} />
-//       </mesh>
-//       <Html transform>
-//         <ControlledInput
-//           type={text}
-//           onChange={(e) => set(e.target.value)}
-//           value={text}
-//         />
-//       </Html>
-//     </group>
-//   );
-// }
 
 export default App;
