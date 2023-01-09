@@ -22,8 +22,13 @@ import { GrCircleQuestion } from "react-icons/gr";
 import { IconContext } from "react-icons";
 import { VscQuestion, VscRefresh, VscMute, VscUnmute } from "react-icons/vsc";
 import { useHover } from "@mantine/hooks";
-import ReactHowler from "react-howler";
 import { Modal } from "@mantine/core";
+import { BsFillArrowRightCircleFill } from "react-icons/bs";
+import { VscHeart } from "react-icons/vsc";
+import { HiOutlineMail } from "react-icons/hi";
+import { VscGithub } from "react-icons/vsc";
+import { FaLinkedin } from "react-icons/fa";
+import { MdOutlineMail } from "react-icons/md";
 
 import Mantine from "./Mantine/Mantine";
 import gsap from "gsap";
@@ -217,14 +222,12 @@ function App() {
       split[4].trim().includes("optimistic")
     ) {
       setWord("optimistic");
-      console.log("optimistic success");
     }
     if (
       split[4].trim().includes("Pessimistic") ||
       split[4].trim().includes("pessimistic")
     ) {
       setWord("pessimistic");
-      console.log("pessimistic success");
     }
     // console.log(response.data.choices[0].text);
     const appended = combined + response.data.choices[0].text;
@@ -494,10 +497,132 @@ function App() {
   //   volume: 0,
   //   loop: true,
   // });
+  const [opened, setOpened] = useState(false);
+  useEffect(() => {
+    if (isMobile) {
+      setOpened(true);
+      setModalSize("100%");
+      setModalFont(18);
+    }
+  }, [isMobile]);
+  const [about, setAbout] = useState(false);
+  const [modalSize, setModalSize] = useState("50%");
+  const [modalFont, setModalFont] = useState(26);
 
   return (
     <>
-      <AudioController2 word={word} />
+      <Modal
+        size={modalSize}
+        overlayOpacity={0.9}
+        overlayBlur={5}
+        overlayColor="rgba(83, 80, 74, 1)"
+        // withCloseButton={false}
+        centered
+        opened={about}
+        onClose={() => setAbout(false)}
+        transition="fade"
+        transitionDuration={2000}
+        transitionTimingFunction="ease"
+        exitTransitionDuration={2000}
+      >
+        <CenterMantine mt={30}>
+          {/* <Stack> */}
+          <Stack spacing="xl" align="center">
+            <Image src="/logo.png" width={60} mb={20} />
+
+            <div style={{ fontSize: modalFont }} className="mobileModal">
+              Stoca analyzes your conversation with a stoic philosopher AI and
+              changes the colors & music to reflect your mood in real time.
+            </div>
+            {"\n"}
+
+            {/* <BsFillArrowRightCircleFill
+              onClick={() => setAbout(false)}
+              style={{ fill: "#A8A28F" }}
+              size={30}
+            /> */}
+            <div style={{ width: "50%" }}>
+              <div style={{ fontSize: 23 }} className="mobileModal">
+                {/* Made with{" "} */}
+                {/* <VscHeart style={{ fill: "#A8A28F", paddingTop: 6 }} /> by Tal */}
+                Created by Tal Halperin
+              </div>
+              <CenterMantine mt={10} mb={20}>
+                <Group spacing={30}>
+                  {/* <HiOutlineMail style={{ fill: "#A8A28F" }} />{" "} */}
+                  <ActionIcon
+                    onClick={() =>
+                      (window.location = "mailto:tal9110@gmail.com")
+                    }
+                  >
+                    <MdOutlineMail size={30} style={{ fill: "#A8A28F" }} />
+                  </ActionIcon>
+                  <ActionIcon
+                    onClick={() =>
+                      window.open("http://github.com/tal9110", "_blank")
+                    }
+                  >
+                    <VscGithub size={30} style={{ fill: "#A8A28F" }} />
+                  </ActionIcon>
+                  <ActionIcon
+                    onClick={() =>
+                      window.open(
+                        "http://www.linkedin.com/in/tal-halperin",
+                        "_blank"
+                      )
+                    }
+                  >
+                    <FaLinkedin size={30} style={{ fill: "#A8A28F" }} />
+                  </ActionIcon>
+                </Group>
+              </CenterMantine>
+            </div>
+            <div style={{ fontSize: 13 }} className="mobileModal">
+              This web experiment harnesses the technology of OpenAI's ChatGPT3
+              API and React Three Fiber. You can find the code{" "}
+              <u
+                style={{ cursor: "pointer" }}
+                onClick={() =>
+                  window.open("http://github.com/tal9110", "_blank")
+                }
+              >
+                here
+              </u>
+            </div>
+          </Stack>
+          {/* <Group mt={20}></Group>
+          </Stack> */}
+        </CenterMantine>
+      </Modal>
+      {isMobile && (
+        <Modal
+          overlayOpacity={0.55}
+          overlayBlur={3}
+          withCloseButton={false}
+          centered
+          opened={opened}
+          onClose={() => setOpened(false)}
+          transition="fade"
+          transitionDuration={600}
+          transitionTimingFunction="ease"
+          exitTransitionDuration={600}
+        >
+          <CenterMantine>
+            <Stack align="center">
+              <div className="mobileModal">
+                For the full audio-immersive experience visit stoca on desktop
+              </div>
+              <BsFillArrowRightCircleFill
+                onClick={() => setOpened(false)}
+                style={{ fill: "#A8A28F" }}
+                size={20}
+              />
+            </Stack>
+          </CenterMantine>
+        </Modal>
+      )}
+      {!isMobile && <AudioController2 word={word} />}
+
       {/* <ReactHowler
         src="/audio/padC.mp3"
         playing={padCPlaying}
@@ -574,7 +699,7 @@ function App() {
 
           <ActionIcon color={"dark"} variant="transparent">
             <VscQuestion
-              // onClick={() => setAbout(!about)}
+              onClick={() => setAbout(true)}
               className="questionIcon"
               size={25}
               style={{ fill: "white" }}
@@ -638,6 +763,7 @@ function App() {
         </CenterMantine>
       </div>
       <animated.div style={springs5}>
+        {/* {isMobile ? <></> : <AudioController />} */}
         <AudioController />
       </animated.div>
       <div
@@ -773,7 +899,8 @@ function App() {
           </AccumulativeShadows> */}
         {/* </group> */}
         {/* <Environment preset="city" /> */}
-        <Postpro />
+        {isMobile ? <></> : <Postpro />}
+
         {/* <Rig /> */}
         <group position={[0.2, -1.5, 0]}>
           <Sphere2

@@ -2,7 +2,15 @@ import React, { useRef } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Howl, Howler } from "howler";
-import { Text, Group, TextInput, Stack, Center, Button } from "@mantine/core";
+import {
+  Text,
+  Group,
+  TextInput,
+  Stack,
+  Center,
+  Button,
+  ActionIcon,
+} from "@mantine/core";
 import TypeIt from "typeit-react";
 import App from "./App";
 import useStore from "./store";
@@ -11,6 +19,8 @@ import gsap from "gsap";
 import { logDOM } from "@testing-library/react";
 import { Image } from "@mantine/core";
 import ReactHowler from "react-howler";
+import { isMobile } from "react-device-detect";
+import { VscArrowSmallRight } from "react-icons/vsc";
 
 export default function AudioController() {
   // const step = useStore((state) => state.step);
@@ -33,17 +43,23 @@ export default function AudioController() {
   // const [keySoundVolume, setKeySoundVolume] = useState(0.5);
   // const [keySoundPlaying, setKeySoundPlaying] = useState(false);
   const handleKeyPress = (event) => {
-    if (event.key === " ") {
-      setPlaying(true);
-    } else if (playing) {
-      keySound.play();
-      // setKeySoundPlaying(true);
-      setCurrentNote((currentNote + 1) % 22);
-      setPlaying(false);
-    }
-    if (event.key === "Enter") {
-      enterSound.play();
-      setEntered(true);
+    if (isMobile) {
+      if (event.key === "Enter") {
+        setEntered(true);
+      }
+    } else {
+      if (event.key === " ") {
+        setPlaying(true);
+      } else if (playing) {
+        keySound.play();
+        // setKeySoundPlaying(true);
+        setCurrentNote((currentNote + 1) % 22);
+        setPlaying(false);
+      }
+      if (event.key === "Enter") {
+        enterSound.play();
+        setEntered(true);
+      }
     }
   };
   const inputElement = document.querySelector(".theInput");
@@ -177,26 +193,70 @@ export default function AudioController() {
       <Center>
         {/* <animated.div> */}
         {/* <div style={{ position: "absolute", zIndex: 1 }}> */}
-        <input
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          spellCheck="false"
-          autoFocus
-          type="text"
-          className="theInput"
-          style={{
-            // caretColor: "#53504A",
-            caretColor: "white",
-            fontSize: 35,
-            textAlign: "center",
-            width: "1000px",
-            height: "70px",
-            bottom: 80,
-            position: "absolute",
-            zIndex: 1,
-          }}
-          onKeyDown={handleKeyPress}
-        />
+        {isMobile ? (
+          <>
+            <div
+              style={{
+                position: "absolute",
+                zIndex: 1,
+                bottom: 70,
+                border: "1px solid #A8A28F",
+                borderRadius: "10px",
+              }}
+            >
+              {/* <Group> */}
+              {/* <Center> */}
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  spellCheck="false"
+                  autoFocus
+                  type="text"
+                  className="theInput"
+                  style={{
+                    // caretColor: "#53504A",
+                    caretColor: "white",
+                    fontSize: 20,
+                    textAlign: "center",
+                    width: "80%",
+
+                    height: "50px",
+                  }}
+                  onKeyDown={handleKeyPress}
+                />
+                {/* </Center> */}
+                <ActionIcon onClick={() => setEntered(true)}>
+                  <VscArrowSmallRight style={{ fill: "#A8A28F" }} size={100} />
+                </ActionIcon>
+              </div>
+              {/* <Button>hello</Button> */}
+              {/* </Group> */}
+            </div>
+          </>
+        ) : (
+          <input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            spellCheck="false"
+            autoFocus
+            type="text"
+            className="theInput"
+            style={{
+              // caretColor: "#53504A",
+              caretColor: "white",
+              fontSize: 35,
+              textAlign: "center",
+              width: "1000px",
+              height: "70px",
+              bottom: 80,
+              position: "absolute",
+              zIndex: 1,
+            }}
+            onKeyDown={handleKeyPress}
+          />
+        )}
+
         {/* </div> */}
 
         {/* </animated.div> */}
