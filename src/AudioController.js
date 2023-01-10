@@ -76,7 +76,7 @@ export default function AudioController(props) {
 
   return (
     <>
-      {props.firstInteraction === 1 && (
+      {props.firstInteraction !== 0 && (
         <>
           <ReactHowler
             src="/audio/padC.mp3"
