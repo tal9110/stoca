@@ -7,8 +7,9 @@
 <h3 align="center">Stoca</h3>
 
   <p align="center">
-       Stoca analyzes your conversation with a stoic philosopher AI and
-              changes the colors & music to reflect your mood in real time
+     Stoca takes you on a reflective journey with a stoic philosopher
+              AI and changes the colors & music to reflect your mood in real
+              time
     <br />
     <br />
 <!--   <p align="center">
