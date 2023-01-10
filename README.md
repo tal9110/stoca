@@ -12,8 +12,11 @@
               time
     <br />
     <br />
+    Built using OpenAI's chatGPT3 API and React Three Fiber
+    <br />
+    <br />
+    Music, code and design by Tal Halperin
 <!--   <p align="center">
-  Built with
   </p -->
 <div align="center">
 
