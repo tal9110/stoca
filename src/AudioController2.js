@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ReactHowler from "react-howler";
-import { useState, useEffect } from "react";
 import gsap from "gsap";
 
 export default function AudioController2(props) {
@@ -21,11 +20,6 @@ export default function AudioController2(props) {
         duration: 5,
         onUpdate: () => setArpCVolume({ volume: arpCVolume.volume }),
       });
-      //   gsap.to(arpFVolume, {
-      //     volume: 0,
-      //     duration: 5,
-      //     onUpdate: () => setArpFVolume({ volume: arpFVolume.volume }),
-      //   });
     }
 
     if (props.word === "pessimistic") {
@@ -44,11 +38,6 @@ export default function AudioController2(props) {
         duration: 5,
         onUpdate: () => setArpCVolume({ volume: arpCVolume.volume }),
       });
-      //   gsap.to(arpFVolume, {
-      //     volume: 0.5,
-      //     duration: 5,
-      //     onUpdate: () => setArpFVolume({ volume: arpFVolume.volume }),
-      //   });
     }
   }, [props.word]);
 
@@ -66,56 +55,38 @@ export default function AudioController2(props) {
       onUpdate: () => setCasetteVolume({ volume: casetteVolume.volume }),
     });
   }, []);
-  const [padCPlaying, setPadCPlaying] = useState(true);
-  //   const [padDPlaying, setPadDPlaying] = useState(true);
-  const [padFPlaying, setPadFPlaying] = useState(true);
-  const [casettePlaying, setCasettePlaying] = useState(true);
-  const [arpCPlaying, setArpCPlaying] = useState(true);
-  //   const [arpFPlaying, setArpFPlaying] = useState(true);
+
   const [padCVolume, setPadCVolume] = useState({ volume: 0 });
-  //   const [padDVolume, setPadDVolume] = useState({ volume: 0 });
   const [padFVolume, setPadFVolume] = useState({ volume: 0 });
   const [casetteVolume, setCasetteVolume] = useState({ volume: 0 });
   const [arpCVolume, setArpCVolume] = useState({ volume: 0.5 });
-  //   const [arpFVolume, setArpFVolume] = useState({ volume: 0 });
   return (
     <>
       <ReactHowler
         src="/audio/padC.mp3"
-        playing={padCPlaying}
+        playing={true}
         volume={padCVolume.volume}
         loop={true}
       />
-      {/* <ReactHowler
-        src="/audio/padD.mp3"
-        playing={padDPlaying}
-        volume={padDVolume.volume}
-        loop={true}
-      /> */}
+
       <ReactHowler
         src={"/audio/padFAndArp.mp3"}
-        playing={padFPlaying}
+        playing={true}
         volume={padFVolume.volume}
         loop={true}
       />
       <ReactHowler
         src={"/audio/casette.mp3"}
-        playing={casettePlaying}
+        playing={true}
         volume={casetteVolume.volume}
         loop={true}
       />
       <ReactHowler
         src={"/audio/arpC.mp3"}
-        playing={arpCPlaying}
+        playing={true}
         volume={arpCVolume.volume}
         loop={true}
       />
-      {/* <ReactHowler
-        src={"/audio/arpF.mp3"}
-        playing={arpFPlaying}
-        volume={arpFVolume.volume}
-        loop={true}
-      /> */}
     </>
   );
 }

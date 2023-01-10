@@ -1,27 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RGBELoader } from "three-stdlib";
-import { Sparkles } from "@react-three/drei";
-
 import * as THREE from "three";
-import {
-  Icosahedron,
-  Point,
-  Points,
-  ScreenQuad,
-  shaderMaterial,
-  Stars,
-  Trail,
-} from "@react-three/drei";
-import { extend, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { shaderMaterial, useGLTF } from "@react-three/drei";
+import { extend, useFrame, useLoader } from "@react-three/fiber";
 import gsap from "gsap";
-import { useState } from "react";
-import { useGLTF, MeshTransmissionMaterial } from "@react-three/drei";
-import { MeshPhysicalMaterial } from "three";
-import { FlakesTexture } from "three-stdlib";
-import { Edges } from "@react-three/drei";
-import { easing } from "maath";
-
-// import useRef from "react";
 
 const newPalette = [
   new THREE.Color("#FFFFFF"),
@@ -34,14 +16,11 @@ const newPalette = [
 const GradientMaterial = shaderMaterial(
   {
     time: 0,
-    // uColor: firstPalette,
     uColor: newPalette,
 
     resolution: new THREE.Vector4(),
     opacity: 0,
     modifier: 1,
-    // u: 1,
-    // amplitude: 0.5,
   },
   /* glsl */ `
     uniform float modifier;
@@ -221,7 +200,6 @@ const GradientMaterial = shaderMaterial(
 );
 
 extend({ GradientMaterial });
-// -1.0 + 2.0 *vUv
 
 export default function GradientTwo(props) {
   const [colors, setColors] = useState([
@@ -243,9 +221,6 @@ export default function GradientTwo(props) {
   }, [props.firstClick]);
 
   useEffect(() => {
-    // console.log(props);
-    // console.log(props.colorOne);
-    // console.log(props.colorTwo);
     let threeColorOne = new THREE.Color(props.colorOne);
     let threeColorTwo = new THREE.Color(props.colorTwo);
     let threeColorThree = new THREE.Color(props.colorThree);
@@ -266,7 +241,6 @@ export default function GradientTwo(props) {
         duration: 2.5,
         ease: "power1.inOut",
         onUpdate: function () {
-          // Update the uniforms with the new color values
           gradientRef.current.material.uniforms.uColor.value[0].setRGB(
             colors[0].r,
             colors[0].g,
@@ -281,7 +255,6 @@ export default function GradientTwo(props) {
         duration: 2.5,
         ease: "power1.inOut",
         onUpdate: function () {
-          // Update the uniforms with the new color values
           gradientRef.current.material.uniforms.uColor.value[1].setRGB(
             colors[1].r,
             colors[1].g,
@@ -296,7 +269,6 @@ export default function GradientTwo(props) {
         duration: 2.5,
         ease: "power1.inOut",
         onUpdate: function () {
-          // Update the uniforms with the new color values
           gradientRef.current.material.uniforms.uColor.value[2].setRGB(
             colors[2].r,
             colors[2].g,
@@ -311,7 +283,6 @@ export default function GradientTwo(props) {
         duration: 2.5,
         ease: "power1.inOut",
         onUpdate: function () {
-          // Update the uniforms with the new color values
           gradientRef.current.material.uniforms.uColor.value[3].setRGB(
             colors[3].r,
             colors[3].g,
@@ -326,7 +297,6 @@ export default function GradientTwo(props) {
         duration: 2.5,
         ease: "power1.inOut",
         onUpdate: function () {
-          // Update the uniforms with the new color values
           gradientRef.current.material.uniforms.uColor.value[4].setRGB(
             colors[4].r,
             colors[4].g,
@@ -344,25 +314,6 @@ export default function GradientTwo(props) {
     props.shape,
   ]);
 
-  // const animateColors = (newColors) => {
-  //   TweenMax.to(colors[0], 2, {
-  //     r: newColors[0].r,
-  //     g: newColors[0].g,
-  //     b: newColors[0].b,
-  //     onUpdate: function() {
-  //       // Update the uniforms with the new color values
-  //       gradientMaterial.uniforms.uColor[0].setRGB(colors[0].r, colors[0].g, colors[0].b);
-  //     }
-  //   });
-  //   TweenMax.to(colors[1], 2, {
-  //     r: newColors[1].r,
-  //     g: newColors[1].g,
-  //     b: newColors[1].b,
-  //     onUpdate: function() {
-  //       // Update the uniforms with the new color values
-  //       gradientMaterial.uniforms.uColor[1].setRGB(colors[1].r, colors[1].g, colors[1].b);
-  //     }
-  //   });
   const statueRef = useRef();
   const gradientRef = useRef();
   const light = useRef();
@@ -374,40 +325,16 @@ export default function GradientTwo(props) {
     y += delta / 5;
     if (props.shape === "sphere") {
       gradientRef.current.material.uniforms.time.value += delta / 40;
-      // gradientRef.current.material.uniforms.opacity.value = 1;
     }
-    // console.log(statueRef);
-    // easing.damp3(
-    //   light.current.position,
-    //   [state.pointer.x * 12, -5, 12 + state.pointer.y * 4],
-    //   0.2,
-    //   delta
-    // );
-    // light.current.position.x = Math.sin(x) * 4;
-    // light.current.position.y = Math.cos(x) * 2;
-    // const speed = 0.01;
-    // const amplitude = 12;
-    // light.current.position.x = Math.sin(x % (2 * Math.PI)) * 12;
-    // light.current.position.z = 12 + Math.cos(y % (2 * Math.PI)) * 4;
 
-    // light.current.position.z = 12 + Math.cos(y) * 4;
     pointRef.current.position.y = Math.sin(x * 1.5) * 5;
     light.current.position.x = Math.sin(x * 1.2) * 8;
     light.current.position.z = 12 + Math.cos(y * 1.2) * 4;
-    // console.log(light.current.position);
   });
-  const { nodes, materials } = useGLTF("/statue1.glb");
-  const texture = useLoader(
-    RGBELoader,
-    "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/aerodynamics_workshop_1k.hdr"
-  );
+  const { nodes } = useGLTF("/statue1.glb");
 
   return (
     <>
-      {/* <group position={[0, 5, 0]}>
-        <Sparkles count={50} scale={10} size={2} speed={0.4} />
-      </group> */}
-
       <pointLight ref={pointRef} intensity={1} position={[0, 0, -5]} />
       <spotLight
         angle={0.5}
@@ -446,24 +373,14 @@ export default function GradientTwo(props) {
             receiveShadow
             geometry={nodes.Buddha_statue.geometry}
             side={THREE.DoubleSide}
-            // material={materials["Default OBJ"]}
-            // position={[38.04, 19.26, -28.28]}
             position={[3.5, 2.1, -3]}
             rotation={[Math.PI / 2, 0, 0]}
-            // material={iridescentMaterial}
             ref={statueRef}
             scale={0.1}
           >
-            {/* <sphereBufferGeometry args={[0.75, 2048, 2048]} /> */}
-            {/* <meshLambertMaterial color="#404044" /> */}
-
             <meshPhysicalMaterial
-              // refraction={1.15}
               roughness={0}
-              // rgbShift={0.25}
               noise={0.04}
-              // contrast={1}
-              // saturation={1.0}
               clearcoat={1}
               clearcoatRoughness={0}
               color="#000000"
@@ -473,57 +390,6 @@ export default function GradientTwo(props) {
               transmission={0.99}
               opacity={0}
             />
-
-            {/* <MeshTransmissionMaterial
-              samples={5}
-              clearcoat={1}
-              clearcoatRoughness={0.1}
-              refraction={2}
-              rgbShift={0.3}
-              contrast={6}
-              noise={0.03}
-              saturation={1.0}
-              color="#000000"
-              gColor="#000000"
-              shadow="#000000"
-              background={texture}
-            /> */}
-
-            {/* <meshStandardMaterial color="black" /> */}
-
-            {/* <gradientMaterial
-              // side={THREE.BackSide}
-              transparent={true}
-              extensions={{
-                derivatives: "#extension GL_OES_standard_derivatives : enable",
-              }}
-            /> */}
-            {/* <MeshTransmissionMaterial
-              roughness={0}
-              resolution={1024}
-              background={new THREE.Color("#000000")}
-              clearcoat={1}
-              samples={3}
-              refraction={1.15}
-              rgbShift={0.25}
-              noise={0.04}
-              contrast={2}
-              saturation={1.0}
-              color="#000000"
-              bg="#000000"
-            /> */}
-            {/* <meshPhysicalMaterial
-              thickness={5}
-              roughness={0}
-              clearcoat={1}
-              clearcoatRoughness={1}
-              transmission={0.5}
-              ior={1.25}
-              envMapIntensity={0}
-              color="#ffffff"
-              attenuationTint="#ffe79e"
-              attenuationDistance={0}
-            /> */}
           </mesh>
         </group>
       )}
