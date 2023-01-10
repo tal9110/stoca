@@ -129,15 +129,12 @@ function App() {
       split[4].trim().includes("Optimistic") ||
       split[4].trim().includes("optimistic")
     ) {
-      console.log("optimistic success");
       setWord("optimistic");
     }
     if (
       split[4].trim().includes("Pessimistic") ||
       split[4].trim().includes("pessimistic")
     ) {
-      console.log("pessimistic success");
-
       setWord("pessimistic");
     }
     const appended = combined + response.data.choices[0].text;
