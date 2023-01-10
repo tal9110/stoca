@@ -301,7 +301,6 @@ export default function GradientBackground(props) {
         );
       },
     });
-    s;
   }, [
     props.colorOne,
     props.colorTwo,
