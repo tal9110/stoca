@@ -37,8 +37,8 @@
 
 ## Screenshots
 <div align=”center”>
-<img width="450" alt="Screenshot 2023-01-09 at 4 59 15 PM copy" src="https://user-images.githubusercontent.com/9994843/211481320-04900a3d-c096-4421-9f1c-ea315e4b7b60.png">
-<img width="450" alt="Screenshot 2023-01-09 at 5 02 27 PM copy" src="https://user-images.githubusercontent.com/9994843/211481326-bcbdb33f-2391-41a3-9d52-20c228012b61.png">
+<img width="400" alt="Screenshot 2023-01-09 at 4 59 15 PM copy" src="https://user-images.githubusercontent.com/9994843/211481320-04900a3d-c096-4421-9f1c-ea315e4b7b60.png">
+<img width="400" alt="Screenshot 2023-01-09 at 5 02 27 PM copy" src="https://user-images.githubusercontent.com/9994843/211481326-bcbdb33f-2391-41a3-9d52-20c228012b61.png">
 </div>
 
 
