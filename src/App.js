@@ -118,6 +118,7 @@ function App() {
     let split = response2.data.choices[0].text
       .split(",")
       .map((color) => color.split("#")[1]);
+    console.log(response2.data.choices[0].text);
 
     setColorOne("#" + split[0].slice(0, 6));
     setColorTwo("#" + split[1].slice(0, 6));
@@ -128,12 +129,15 @@ function App() {
       split[4].trim().includes("Optimistic") ||
       split[4].trim().includes("optimistic")
     ) {
+      console.log("optimistic success");
       setWord("optimistic");
     }
     if (
       split[4].trim().includes("Pessimistic") ||
       split[4].trim().includes("pessimistic")
     ) {
+      console.log("pessimistic success");
+
       setWord("pessimistic");
     }
     const appended = combined + response.data.choices[0].text;
