@@ -9,6 +9,18 @@ export default function AudioController(props) {
       setPadFPlaying(true);
       setCasettePlaying(true);
       setArpCPlaying(true);
+      gsap.to(padCVolume, {
+        delay: 6,
+        volume: 0.5,
+        duration: 4,
+        onUpdate: () => setPadCVolume({ volume: padCVolume.volume }),
+      });
+      gsap.to(casetteVolume, {
+        delay: 4,
+        volume: 0.3,
+        duration: 3,
+        onUpdate: () => setCasetteVolume({ volume: casetteVolume.volume }),
+      });
     }
   }, [props.firstInteraction]);
 
@@ -49,21 +61,6 @@ export default function AudioController(props) {
       });
     }
   }, [props.word]);
-
-  useEffect(() => {
-    gsap.to(padCVolume, {
-      delay: 6,
-      volume: 0.5,
-      duration: 4,
-      onUpdate: () => setPadCVolume({ volume: padCVolume.volume }),
-    });
-    gsap.to(casetteVolume, {
-      delay: 4,
-      volume: 0.3,
-      duration: 3,
-      onUpdate: () => setCasetteVolume({ volume: casetteVolume.volume }),
-    });
-  }, []);
 
   const [padCVolume, setPadCVolume] = useState({ volume: 0 });
   const [padFVolume, setPadFVolume] = useState({ volume: 0 });
