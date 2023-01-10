@@ -1,15 +1,15 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Howl } from "howler";
-import { Stack, Center, ActionIcon } from "@mantine/core";
-import TypeIt from "typeit-react";
+import { Center, ActionIcon } from "@mantine/core";
 import useStore from "./store";
 import { useSpring } from "@react-spring/web";
 import gsap from "gsap";
 import { isMobile } from "react-device-detect";
 import { VscArrowSmallRight } from "react-icons/vsc";
+import AudioController from "./AudioController";
 
-export default function InputBar() {
+export default function InputBar(props) {
   const changeInput = useStore((state) => state.changeInput);
 
   const [playing, setPlaying] = useState(false);
@@ -143,6 +143,7 @@ export default function InputBar() {
           />
         )}
       </Center>
+      {!isMobile && <AudioController word={props.word} />}
     </>
   );
 }

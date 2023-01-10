@@ -5,6 +5,10 @@ import gsap from "gsap";
 export default function AudioController(props) {
   useEffect(() => {
     if (props.word === "optimistic") {
+      setPadCPlaying(true);
+      setPadFPlaying(true);
+      setCasettePlaying(true);
+      setArpCPlaying(true);
       gsap.to(padCVolume, {
         volume: 0.5,
         duration: 3,
@@ -23,6 +27,10 @@ export default function AudioController(props) {
     }
 
     if (props.word === "pessimistic") {
+      setPadCPlaying(true);
+      setPadFPlaying(true);
+      setCasettePlaying(true);
+      setArpCPlaying(true);
       gsap.to(padCVolume, {
         volume: 0,
         duration: 5,
@@ -60,30 +68,35 @@ export default function AudioController(props) {
   const [padFVolume, setPadFVolume] = useState({ volume: 0 });
   const [casetteVolume, setCasetteVolume] = useState({ volume: 0 });
   const [arpCVolume, setArpCVolume] = useState({ volume: 0.5 });
+  const [padCPlaying, setPadCPlaying] = useState(false);
+  const [padFPlaying, setPadFPlaying] = useState(false);
+  const [casettePlaying, setCasettePlaying] = useState(false);
+  const [arpCPlaying, setArpCPlaying] = useState(false);
+
   return (
     <>
       <ReactHowler
         src="/audio/padC.mp3"
-        playing={true}
+        playing={padCPlaying}
         volume={padCVolume.volume}
         loop={true}
       />
 
       <ReactHowler
         src={"/audio/padFAndArp.mp3"}
-        playing={true}
+        playing={padFPlaying}
         volume={padFVolume.volume}
         loop={true}
       />
       <ReactHowler
         src={"/audio/casette.mp3"}
-        playing={true}
+        playing={casettePlaying}
         volume={casetteVolume.volume}
         loop={true}
       />
       <ReactHowler
         src={"/audio/arpC.mp3"}
-        playing={true}
+        playing={arpCPlaying}
         volume={arpCVolume.volume}
         loop={true}
       />

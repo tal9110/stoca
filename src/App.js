@@ -19,7 +19,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { isMobile } from "react-device-detect";
 import { VscGithub, VscQuestion } from "react-icons/vsc";
-import { BsFillArrowRightCircleFill } from "react-icons/bs";
+import { BsFillArrowRightCircleFill, BsWordpress } from "react-icons/bs";
 import { FaLinkedin } from "react-icons/fa";
 import { MdOutlineMail } from "react-icons/md";
 import Env from "./Env";
@@ -295,26 +295,6 @@ function App() {
 
   return (
     <>
-      {/* React Three Fiber Canvas */}
-      <Canvas
-        shadows
-        camera={{ position: [0, 0, 6.5], fov: 50 }}
-        gl={{ antialias: false }}
-      >
-        <group position={[0.2, -1.5, 0]}>
-          <Scene
-            firstClick={firstClick}
-            colorOne={colorOne}
-            colorTwo={colorTwo}
-            colorThree={colorThree}
-            colorFour={colorFour}
-            colorFive={colorFive}
-          />
-        </group>
-        <Env enterIncrement={enterIncrement} />
-        {!isMobile && <Postproduction />}
-      </Canvas>
-
       {/* Wordmark and Question Mark */}
       <Image
         className="wordmark"
@@ -352,7 +332,7 @@ function App() {
       <div
         style={{
           position: "absolute",
-          zIndex: 1,
+          zIndex: 2,
           padding: "1rem",
           width: "100%",
           textAlign: "center",
@@ -407,7 +387,7 @@ function App() {
 
       {/* Input Bar */}
       <animated.div style={springs5}>
-        <InputBar />
+        <InputBar word={word} />
       </animated.div>
 
       {/* About  */}
@@ -435,7 +415,7 @@ function App() {
             </div>
             {"\n"}
             <div style={{ width: "50%" }}>
-              <div style={{ fontSize: 23 }} className="mobileModal">
+              <div style={{ fontSize: 21.5 }} className="mobileModal">
                 Created by Tal Halperin
               </div>
               <CenterMantine mt={10} mb={20}>
@@ -482,8 +462,6 @@ function App() {
           </Stack>
         </CenterMantine>
       </Modal>
-      {/* Audio Controller */}
-      {!isMobile && <AudioController word={word} />}
 
       {/* Modal to display if user is on mobile */}
       {isMobile && (
@@ -513,6 +491,26 @@ function App() {
           </CenterMantine>
         </Modal>
       )}
+
+      {/* React Three Fiber Canvas */}
+      <Canvas
+        shadows
+        camera={{ position: [0, 0, 6.5], fov: 50 }}
+        gl={{ antialias: false }}
+      >
+        <group position={[0.2, -1.5, 0]}>
+          <Scene
+            firstClick={firstClick}
+            colorOne={colorOne}
+            colorTwo={colorTwo}
+            colorThree={colorThree}
+            colorFour={colorFour}
+            colorFive={colorFive}
+          />
+        </group>
+        <Env enterIncrement={enterIncrement} />
+        {!isMobile && <Postproduction />}
+      </Canvas>
     </>
   );
 }
