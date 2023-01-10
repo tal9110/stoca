@@ -4,10 +4,12 @@ import gsap from "gsap";
 
 export default function AudioController(props) {
   useEffect(() => {
-    setPadCPlaying(true);
-    setPadFPlaying(true);
-    setCasettePlaying(true);
-    setArpCPlaying(true);
+    if (props.firstInteraction === 1) {
+      setPadCPlaying(true);
+      setPadFPlaying(true);
+      setCasettePlaying(true);
+      setArpCPlaying(true);
+    }
   }, [props.firstInteraction]);
 
   useEffect(() => {
@@ -74,7 +76,7 @@ export default function AudioController(props) {
 
   return (
     <>
-      {props.firstInteraction && (
+      {props.firstInteraction === 1 && (
         <>
           <ReactHowler
             src="/audio/padC.mp3"
