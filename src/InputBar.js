@@ -25,6 +25,7 @@ export default function InputBar(props) {
   });
 
   const handleKeyPress = (event) => {
+    setFirstInteraction(firstInteraction + 1);
     if (isMobile) {
       if (event.key === "Enter") {
         setEntered(true);
@@ -77,11 +78,11 @@ export default function InputBar(props) {
 
   const [inputValue, setInputValue] = useState("");
 
-  const [typeIts, setTypeIts] = useState([]);
-
   const [springs, api] = useSpring(() => ({
     from: { opacity: 1 },
   }));
+
+  const [firstInteraction, setFirstInteraction] = useState(0);
 
   return (
     <>
@@ -143,7 +144,12 @@ export default function InputBar(props) {
           />
         )}
       </Center>
-      {!isMobile && <AudioController word={props.word} />}
+      {!isMobile && (
+        <AudioController
+          firstInteraction={firstInteraction}
+          word={props.word}
+        />
+      )}
     </>
   );
 }

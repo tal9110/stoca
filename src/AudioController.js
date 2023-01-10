@@ -4,11 +4,14 @@ import gsap from "gsap";
 
 export default function AudioController(props) {
   useEffect(() => {
+    setPadCPlaying(true);
+    setPadFPlaying(true);
+    setCasettePlaying(true);
+    setArpCPlaying(true);
+  }, [props.firstInteraction]);
+
+  useEffect(() => {
     if (props.word === "optimistic") {
-      setPadCPlaying(true);
-      setPadFPlaying(true);
-      setCasettePlaying(true);
-      setArpCPlaying(true);
       gsap.to(padCVolume, {
         volume: 0.5,
         duration: 3,
@@ -27,10 +30,6 @@ export default function AudioController(props) {
     }
 
     if (props.word === "pessimistic") {
-      setPadCPlaying(true);
-      setPadFPlaying(true);
-      setCasettePlaying(true);
-      setArpCPlaying(true);
       gsap.to(padCVolume, {
         volume: 0,
         duration: 5,
@@ -75,31 +74,34 @@ export default function AudioController(props) {
 
   return (
     <>
-      <ReactHowler
-        src="/audio/padC.mp3"
-        playing={padCPlaying}
-        volume={padCVolume.volume}
-        loop={true}
-      />
-
-      <ReactHowler
-        src={"/audio/padFAndArp.mp3"}
-        playing={padFPlaying}
-        volume={padFVolume.volume}
-        loop={true}
-      />
-      <ReactHowler
-        src={"/audio/casette.mp3"}
-        playing={casettePlaying}
-        volume={casetteVolume.volume}
-        loop={true}
-      />
-      <ReactHowler
-        src={"/audio/arpC.mp3"}
-        playing={arpCPlaying}
-        volume={arpCVolume.volume}
-        loop={true}
-      />
+      {props.firstInteraction && (
+        <>
+          <ReactHowler
+            src="/audio/padC.mp3"
+            playing={padCPlaying}
+            volume={padCVolume.volume}
+            loop={true}
+          />
+          <ReactHowler
+            src={"/audio/padFAndArp.mp3"}
+            playing={padFPlaying}
+            volume={padFVolume.volume}
+            loop={true}
+          />
+          <ReactHowler
+            src={"/audio/casette.mp3"}
+            playing={casettePlaying}
+            volume={casetteVolume.volume}
+            loop={true}
+          />
+          <ReactHowler
+            src={"/audio/arpC.mp3"}
+            playing={arpCPlaying}
+            volume={arpCVolume.volume}
+            loop={true}
+          />
+        </>
+      )}
     </>
   );
 }
