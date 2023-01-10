@@ -1,175 +1,92 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { Howl } from "howler";
-import { Stack, Center, ActionIcon } from "@mantine/core";
-import TypeIt from "typeit-react";
-import useStore from "./store";
-import { useSpring } from "@react-spring/web";
+import React, { useState, useEffect } from "react";
+import ReactHowler from "react-howler";
 import gsap from "gsap";
-import { isMobile } from "react-device-detect";
-import { VscArrowSmallRight } from "react-icons/vsc";
 
-export default function AudioController() {
-  const changeInput = useStore((state) => state.changeInput);
-
-  const [playing, setPlaying] = useState(false);
-  const [currentNote, setCurrentNote] = useState(0);
-  const [entered, setEntered] = useState(false);
-  const keySound = new Howl({
-    src: [`/audio/${currentNote}.mp3`],
-    volume: 0.4,
-  });
-  const enterSound = new Howl({
-    src: [`/audio/enter.mp3`],
-    volume: 0.5,
-  });
-
-  const handleKeyPress = (event) => {
-    if (isMobile) {
-      if (event.key === "Enter") {
-        setEntered(true);
-      }
-    } else {
-      if (event.key === " ") {
-        setPlaying(true);
-      } else if (playing) {
-        keySound.play();
-        setCurrentNote((currentNote + 1) % 22);
-        setPlaying(false);
-      }
-      if (event.key === "Enter") {
-        enterSound.play();
-        setEntered(true);
-      }
+export default function AudioController(props) {
+  useEffect(() => {
+    if (props.word === "optimistic") {
+      gsap.to(padCVolume, {
+        volume: 0.5,
+        duration: 3,
+        onUpdate: () => setPadCVolume({ volume: padCVolume.volume }),
+      });
+      gsap.to(padFVolume, {
+        volume: 0,
+        duration: 5,
+        onUpdate: () => setPadFVolume({ volume: padFVolume.volume }),
+      });
+      gsap.to(arpCVolume, {
+        volume: 0.5,
+        duration: 5,
+        onUpdate: () => setArpCVolume({ volume: arpCVolume.volume }),
+      });
     }
-  };
-  const inputElement = document.querySelector(".theInput");
+
+    if (props.word === "pessimistic") {
+      gsap.to(padCVolume, {
+        volume: 0,
+        duration: 5,
+        onUpdate: () => setPadCVolume({ volume: padCVolume.volume }),
+      });
+      gsap.to(padFVolume, {
+        volume: 0.5,
+        duration: 5,
+        onUpdate: () => setPadFVolume({ volume: padFVolume.volume }),
+      });
+      gsap.to(arpCVolume, {
+        volume: 0,
+        duration: 5,
+        onUpdate: () => setArpCVolume({ volume: arpCVolume.volume }),
+      });
+    }
+  }, [props.word]);
 
   useEffect(() => {
-    if (entered) {
-      gsap.to(inputElement, {
-        delay: 0.1,
-        opacity: 0,
-        duration: 2,
-        onComplete: () => {
-          setInputValue("");
-        },
-      });
-      gsap.to(inputElement, {
-        delay: 2.1,
-        opacity: 1,
-        duration: 2,
-      });
-      changeInput(inputValue);
+    gsap.to(padCVolume, {
+      delay: 6,
+      volume: 0.5,
+      duration: 4,
+      onUpdate: () => setPadCVolume({ volume: padCVolume.volume }),
+    });
+    gsap.to(casetteVolume, {
+      delay: 4,
+      volume: 0.3,
+      duration: 3,
+      onUpdate: () => setCasetteVolume({ volume: casetteVolume.volume }),
+    });
+  }, []);
 
-      api.start({
-        from: {
-          opacity: 1,
-        },
-        to: {
-          opacity: 0,
-        },
-        duration: 3000,
-      });
-      setEntered(false);
-    }
-  }, [entered]);
-
-  const [inputValue, setInputValue] = useState("");
-
-  const [typeIts, setTypeIts] = useState([]);
-
-  const [springs, api] = useSpring(() => ({
-    from: { opacity: 1 },
-  }));
-
+  const [padCVolume, setPadCVolume] = useState({ volume: 0 });
+  const [padFVolume, setPadFVolume] = useState({ volume: 0 });
+  const [casetteVolume, setCasetteVolume] = useState({ volume: 0 });
+  const [arpCVolume, setArpCVolume] = useState({ volume: 0.5 });
   return (
     <>
-      <div
-        style={{
-          visibility: "hidden",
-          position: "absolute",
-          zIndex: 1,
-          padding: "1rem",
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
-        <Center>
-          <Stack mt={70}>
-            <TypeIt
-              className="theHeader"
-              options={{
-                afterComplete: () => {
-                  document.querySelector(".ti-cursor").style.display = "none";
-                },
-              }}
-            >
-              How do you feel right now?
-            </TypeIt>
-            {typeIts.map((typeIt) => typeIt)}
-          </Stack>
-        </Center>
-      </div>
+      <ReactHowler
+        src="/audio/padC.mp3"
+        playing={true}
+        volume={padCVolume.volume}
+        loop={true}
+      />
 
-      <Center>
-        {isMobile ? (
-          <>
-            <div
-              style={{
-                position: "absolute",
-                zIndex: 1,
-                bottom: 70,
-                border: "1px solid #A8A28F",
-                borderRadius: "10px",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  spellCheck="false"
-                  autoFocus
-                  type="text"
-                  className="theInput"
-                  style={{
-                    caretColor: "white",
-                    fontSize: 20,
-                    textAlign: "center",
-                    width: "80%",
-
-                    height: "50px",
-                  }}
-                  onKeyDown={handleKeyPress}
-                />
-                <ActionIcon onClick={() => setEntered(true)}>
-                  <VscArrowSmallRight style={{ fill: "#A8A28F" }} size={100} />
-                </ActionIcon>
-              </div>
-            </div>
-          </>
-        ) : (
-          <input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            spellCheck="false"
-            autoFocus
-            type="text"
-            className="theInput"
-            style={{
-              caretColor: "white",
-              fontSize: 35,
-              textAlign: "center",
-              width: "1000px",
-              height: "70px",
-              bottom: 80,
-              position: "absolute",
-              zIndex: 1,
-            }}
-            onKeyDown={handleKeyPress}
-          />
-        )}
-      </Center>
+      <ReactHowler
+        src={"/audio/padFAndArp.mp3"}
+        playing={true}
+        volume={padFVolume.volume}
+        loop={true}
+      />
+      <ReactHowler
+        src={"/audio/casette.mp3"}
+        playing={true}
+        volume={casetteVolume.volume}
+        loop={true}
+      />
+      <ReactHowler
+        src={"/audio/arpC.mp3"}
+        playing={true}
+        volume={arpCVolume.volume}
+        loop={true}
+      />
     </>
   );
 }

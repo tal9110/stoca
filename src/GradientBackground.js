@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { RGBELoader } from "three-stdlib";
 import * as THREE from "three";
-import { shaderMaterial, useGLTF } from "@react-three/drei";
-import { extend, useFrame, useLoader } from "@react-three/fiber";
+import { shaderMaterial } from "@react-three/drei";
+import { extend, useFrame } from "@react-three/fiber";
 import gsap from "gsap";
 
 const newPalette = [
@@ -17,7 +16,6 @@ const GradientMaterial = shaderMaterial(
   {
     time: 0,
     uColor: newPalette,
-
     resolution: new THREE.Vector4(),
     opacity: 0,
     modifier: 1,
@@ -201,7 +199,7 @@ const GradientMaterial = shaderMaterial(
 
 extend({ GradientMaterial });
 
-export default function GradientTwo(props) {
+export default function GradientBackground(props) {
   const [colors, setColors] = useState([
     new THREE.Color("#FFFFFF"),
     new THREE.Color("#000000"),
@@ -313,8 +311,6 @@ export default function GradientTwo(props) {
     props.colorFive,
     props.shape,
   ]);
-
-  const statueRef = useRef();
   const gradientRef = useRef();
   const light = useRef();
   let x = 0;
@@ -326,12 +322,10 @@ export default function GradientTwo(props) {
     if (props.shape === "sphere") {
       gradientRef.current.material.uniforms.time.value += delta / 40;
     }
-
     pointRef.current.position.y = Math.sin(x * 1.5) * 5;
     light.current.position.x = Math.sin(x * 1.2) * 8;
     light.current.position.z = 12 + Math.cos(y * 1.2) * 4;
   });
-  const { nodes } = useGLTF("/statue1.glb");
 
   return (
     <>
@@ -350,51 +344,16 @@ export default function GradientTwo(props) {
           args={[-10, 10, -10, 10, 0.1, 50]}
         />
       </spotLight>
-      {props.shape === "sphere" ? (
-        <mesh
-          // visible={false}
-          receiveShadow
-          rotation-y={-Math.PI / 2}
-          ref={gradientRef}
-        >
-          <sphereGeometry args={[0.75, 2048, 2048]} />
-          <gradientMaterial
-            side={THREE.BackSide}
-            transparent={true}
-            extensions={{
-              derivatives: "#extension GL_OES_standard_derivatives : enable",
-            }}
-          />
-        </mesh>
-      ) : (
-        <group {...props} dispose={null}>
-          <mesh
-            castShadow
-            receiveShadow
-            geometry={nodes.Buddha_statue.geometry}
-            side={THREE.DoubleSide}
-            position={[3.5, 2.1, -3]}
-            rotation={[Math.PI / 2, 0, 0]}
-            ref={statueRef}
-            scale={0.1}
-          >
-            <meshPhysicalMaterial
-              roughness={0}
-              noise={0.04}
-              clearcoat={1}
-              clearcoatRoughness={0}
-              color="#000000"
-              bg="#000000"
-              envMapIntensity={1}
-              ior={1.25}
-              transmission={0.99}
-              opacity={0}
-            />
-          </mesh>
-        </group>
-      )}
+      <mesh receiveShadow rotation-y={-Math.PI / 2} ref={gradientRef}>
+        <sphereGeometry args={[0.75, 2048, 2048]} />
+        <gradientMaterial
+          side={THREE.BackSide}
+          transparent={true}
+          extensions={{
+            derivatives: "#extension GL_OES_standard_derivatives : enable",
+          }}
+        />
+      </mesh>
     </>
   );
 }
-
-useGLTF.preload("/statue1.glb");
