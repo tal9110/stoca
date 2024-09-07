@@ -56,16 +56,16 @@ function App() {
   const [modalFont, setModalFont] = useState(26);
   const [typeIts, setTypeIts] = useState([]);
 
+  // Updated API call with new Chat API
   const generateResponse2 = async (inputt) => {
     setFirstClick(firstClick + 1);
-    const combined = finalPrompt + "\nHuman:" + inputt + "\nAI:";
 
     try {
       const response = await openai.createChatCompletion({
-        model: "gpt-4", // or gpt-4-turbo for more efficient response
+        model: "gpt-3.5-turbo", // or gpt-4 depending on your subscription
         messages: [
-          { role: "system", content: finalPrompt }, // System message setting the role
-          { role: "user", content: inputt }, // User message for current input
+          { role: "system", content: finalPrompt }, // Setting the system message
+          { role: "user", content: inputt }, // User input
         ],
         temperature: 0.9,
         max_tokens: 300,
@@ -77,19 +77,16 @@ function App() {
       const aiResponse = response.data.choices[0].message.content;
       setAiOutput(aiResponse);
 
-      // Appending to finalPrompt to retain conversation context
-      const appended = combined + aiResponse;
+      // Appending the AI response to the conversation context
+      const appended = finalPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse;
       setFinalPrompt(appended);
 
-      // Trigger animations
-      api4.start({ opacity: 0, config: { duration: 1500 } });
-      api3.start({ opacity: 1, config: { duration: 1000 } });
       setLoading(false);
     } catch (error) {
       console.error("Error with OpenAI API: ", error);
     }
 
-    // Color palette API request
+    // Color palette API request (if required)
     const response2 = await openai.createCompletion({
       model: "text-davinci-003",
       prompt:
