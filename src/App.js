@@ -259,7 +259,7 @@ function App() {
 
   useEffect(() => {
     api.start({
-      delay: 1000,
+      delay: 999,
 
       from: {
         opacity: 0,
