@@ -111,6 +111,8 @@ function App() {
       });
 
       const paletteResponse = colorCompletion.choices[0].message.content;
+      console.log("Palette Response:", paletteResponse);
+
       const split = paletteResponse
         .split(",")
         .map((color) => color.split("#")[1]);
