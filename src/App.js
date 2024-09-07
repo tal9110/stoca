@@ -153,17 +153,11 @@ function App() {
 
     if (aiOutput === undefined) return;
     const newTypeIt = (
-      <TypeIt
-        className="theResponse"
-        options={{
-          afterComplete: () => {
-            document.querySelector(".ti-cursor").style.display = "none";
-          },
-          speed: 60,
-        }}
-      >
-        {aiOutput}
-      </TypeIt>
+      <div>
+        {typeIts.map((typeIt, index) => (
+          <div key={index}>{aiOutput}</div>
+        ))}
+      </div>
     );
 
     console.log("typeIts before:", typeIts);
