@@ -29,9 +29,9 @@ import Postproduction from "./Postproduction";
 import TypeIt from "typeit-react";
 
 function App() {
-  const configuration = new Configuration({
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-  });
+  // const configuration = new Configuration({
+  //   apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+  // });
   const openai = new OpenAI({
     apiKey: process.env.REACT_APP_OPENAI_API_KEY, // API Key from environment variable
     organization: "org-xl3gZeUkDOQrIqypLNygYEtZ", // Your organization ID
