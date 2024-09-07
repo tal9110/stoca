@@ -38,7 +38,7 @@ export default function Postproduction() {
         renderToScreen={false}
       >
         <shaderPass
-          uniforms-weight-value={0.2}
+          uniforms-weight-value={0.4}
           args={[VolumetricLightShader]}
           needsSwap={false}
         />
