@@ -36,6 +36,7 @@ function App() {
     apiKey: process.env.REACT_APP_OPENAI_API_KEY, // API Key from environment variable
     organization: "org-xl3gZeUkDOQrIqypLNygYEtZ", // Your organization ID
     project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY",
+    dangerouslyAllowBrowser: true,
   });
   const [colorOne, setColorOne] = useState("#F2F2F2");
   const [colorTwo, setColorTwo] = useState("#FECF9E");
