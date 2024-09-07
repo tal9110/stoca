@@ -514,12 +514,12 @@ function App() {
       )}
 
       {/* React Three Fiber Canvas */}
-      <Canvas
+      {/* <Canvas
         shadows
         camera={{ position: [0, 0, 6.5], fov: 50 }}
         gl={{ antialias: false }}
-      >
-        {/* <group position={[0.2, -1.5, 0]}>
+      > */}
+      {/* <group position={[0.2, -1.5, 0]}>
           <Scene
             firstClick={firstClick}
             colorOne={colorOne}
@@ -529,9 +529,9 @@ function App() {
             colorFive={colorFive}
           />
         </group> */}
-        {/* <Env enterIncrement={enterIncrement} /> */}
-        {/* {!isMobile && <Postproduction />} */}
-      </Canvas>
+      {/* <Env enterIncrement={enterIncrement} /> */}
+      {/* {!isMobile && <Postproduction />} */}
+      {/* </Canvas> */}
     </>
   );
 }
