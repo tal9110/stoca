@@ -147,19 +147,15 @@ function App() {
       );
     }
   };
+
   useEffect(() => {
-    console.log("aiOutput updated:", aiOutput);
-
     if (aiOutput === undefined) return;
-
-    // Create the new TypeIt component
     const newTypeIt = (
       <TypeIt
         className="theResponse"
         options={{
           afterComplete: () => {
-            const cursor = document.querySelector(".ti-cursor");
-            if (cursor) cursor.style.display = "none";
+            document.querySelector(".ti-cursor").style.display = "none";
           },
           speed: 60,
         }}
@@ -168,14 +164,7 @@ function App() {
       </TypeIt>
     );
 
-    // Log the state before updating
-    console.log("typeIts before:", typeIts);
-
-    // Update the typeIts state immutably
-    setTypeIts((prevTypeIts) => [...prevTypeIts, newTypeIt]);
-
-    // Log the updated state
-    console.log("typeIts after:", [...typeIts, newTypeIt]);
+    setTypeIts([...typeIts, newTypeIt]);
   }, [aiOutput]);
 
   useEffect(() => {
@@ -516,8 +505,8 @@ function App() {
         shadows
         camera={{ position: [0, 0, 6.5], fov: 50 }}
         gl={{ antialias: false }}
-      > */}
-      {/* <group position={[0.2, -1.5, 0]}>
+      >
+        <group position={[0.2, -1.5, 0]}>
           <Scene
             firstClick={firstClick}
             colorOne={colorOne}
@@ -526,10 +515,10 @@ function App() {
             colorFour={colorFour}
             colorFive={colorFive}
           />
-        </group> */}
-      {/* <Env enterIncrement={enterIncrement} /> */}
-      {/* {!isMobile && <Postproduction />} */}
-      {/* </Canvas> */}
+        </group>
+        <Env enterIncrement={enterIncrement} />
+        {!isMobile && <Postproduction />}
+      </Canvas> */}
     </>
   );
 }
