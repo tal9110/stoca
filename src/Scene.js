@@ -8,7 +8,7 @@ export default function Scene(props) {
   const randomLight = useRef();
   return (
     <>
-      <AccumulativeShadows
+      {/* <AccumulativeShadows
         frames={100}
         color="purple"
         colorBlend={0.5}
@@ -25,7 +25,7 @@ export default function Scene(props) {
             bias={0.001}
           />
         </group>
-      </AccumulativeShadows>
+      </AccumulativeShadows> */}
       <group scale={20}>
         <GradientBackground
           firstClick={props.firstClick}
