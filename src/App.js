@@ -153,11 +153,17 @@ function App() {
 
     if (aiOutput === undefined) return;
     const newTypeIt = (
-      <div>
-        {typeIts.map((typeIt, index) => (
-          <div key={index}>{aiOutput}</div>
-        ))}
-      </div>
+      <TypeIt
+        className="theResponse"
+        options={{
+          afterComplete: () => {
+            document.querySelector(".ti-cursor").style.display = "none";
+          },
+          speed: 60,
+        }}
+      >
+        {aiOutput}
+      </TypeIt>
     );
 
     console.log("typeIts before:", typeIts);
@@ -354,7 +360,7 @@ function App() {
               </Container>
             ) : (
               <animated.div style={springs}>
-                <TypeIt
+                {/* <TypeIt
                   className="theHeader"
                   options={{
                     afterComplete: () => {
@@ -364,7 +370,10 @@ function App() {
                   }}
                 >
                   How do you feel right now?
-                </TypeIt>
+                </TypeIt> */}
+                <div>
+                  <p>{aiOutput}</p>
+                </div>
               </animated.div>
             )}
             <Container mt={40}>
