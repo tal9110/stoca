@@ -5,11 +5,11 @@ import { extend, useFrame } from "@react-three/fiber";
 import gsap from "gsap";
 
 const newPalette = [
-  new THREE.Color("#FFFFFF"),
-  new THREE.Color("#000000"),
-  new THREE.Color("#FFFFFF"),
-  new THREE.Color("#000000"),
-  new THREE.Color("#FFFFFF"),
+  new THREE.Color("#F2F2F2"),
+  new THREE.Color("#FECF9E"),
+  new THREE.Color("#F7A277"),
+  new THREE.Color("#D8A8A8"),
+  new THREE.Color("#A8D9D8"),
 ];
 
 const GradientMaterial = shaderMaterial(
