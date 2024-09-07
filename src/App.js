@@ -80,6 +80,8 @@ function App() {
       });
 
       const aiResponse = completion.choices[0].message.content;
+      console.log("AI Response:", aiResponse);
+
       setAiOutput(aiResponse);
 
       const appended = finalPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse;
@@ -147,6 +149,8 @@ function App() {
   };
 
   useEffect(() => {
+    console.log("aiOutput updated:", aiOutput);
+
     if (aiOutput === undefined) return;
     const newTypeIt = (
       <TypeIt
@@ -162,7 +166,9 @@ function App() {
       </TypeIt>
     );
 
+    console.log("typeIts before:", typeIts);
     setTypeIts([...typeIts, newTypeIt]);
+    console.log("typeIts after:", [...typeIts, newTypeIt]);
   }, [aiOutput]);
 
   useEffect(() => {
