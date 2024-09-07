@@ -1,10 +1,9 @@
-import "./styles.css";
+import React, { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import useStore from "./store";
 import { useSpring, animated } from "@react-spring/web";
 import { PulseLoader } from "react-spinners";
 import InputBar from "./InputBar";
-import AudioController from "./AudioController";
 import OpenAI from "openai";
 import {
   Image,
@@ -16,10 +15,9 @@ import {
   Stack,
   Modal,
 } from "@mantine/core";
-import { useState, useEffect, useRef } from "react";
 import { isMobile } from "react-device-detect";
 import { VscGithub, VscQuestion } from "react-icons/vsc";
-import { BsFillArrowRightCircleFill, BsWordpress } from "react-icons/bs";
+import { BsFillArrowRightCircleFill } from "react-icons/bs";
 import { FaLinkedin } from "react-icons/fa";
 import { MdOutlineMail } from "react-icons/md";
 import Env from "./Env";
@@ -29,11 +27,12 @@ import TypeIt from "typeit-react";
 
 function App() {
   const openai = new OpenAI({
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY, // API Key from environment variable
-    organization: "org-xl3gZeUkDOQrIqypLNygYEtZ", // Your organization ID
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    organization: "org-xl3gZeUkDOQrIqypLNygYEtZ",
     project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY",
     dangerouslyAllowBrowser: true,
   });
+
   const [colorOne, setColorOne] = useState("#F2F2F2");
   const [colorTwo, setColorTwo] = useState("#FECF9E");
   const [colorThree, setColorThree] = useState("#F7A277");
@@ -45,7 +44,7 @@ function App() {
     "The following is a conversation with an AI Stoic Philosopher. The philosopher is helpful, creative, clever, friendly, gives brief stoic advice, and asks deep questions.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
   );
   const [firstClick, setFirstClick] = useState(0);
-  const [aiOutput, setAiOutput] = useState();
+  const [aiOutput, setAiOutput] = useState("");
   const inputStore = useStore((state) => state.inputStore);
   const [firstInput, setFirstInput] = useState(false);
   const [inputHeaderText, setInputHeaderText] = useState("");
@@ -57,16 +56,16 @@ function App() {
   const [modalFont, setModalFont] = useState(26);
   const [typeIts, setTypeIts] = useState([]);
 
-  // Updated API call with new Chat API
   const generateResponse2 = async (inputt) => {
     setFirstClick(firstClick + 1);
+    setLoading(true);
 
     try {
       const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: finalPrompt }, // Setting the role of the AI
-          { role: "user", content: inputt }, // User input message
+          { role: "system", content: finalPrompt },
+          { role: "user", content: inputt },
         ],
         temperature: 0.9,
         max_tokens: 300,
@@ -89,9 +88,10 @@ function App() {
         "Error with OpenAI API:",
         error.response?.data || error.message
       );
+      setLoading(false);
     }
 
-    // Generate the Color Palette using gpt-3.5-turbo
+    // Generate the Color Palette
     try {
       const colorCompletion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -101,7 +101,7 @@ function App() {
             content:
               "You are a color palette generator. Provide five different hex value colors that create a palette matching the input's sentiment. Then describe that sentiment as either optimistic or pessimistic.",
           },
-          { role: "user", content: inputt }, // User input for color generation
+          { role: "user", content: inputt },
         ],
         temperature: 0,
         max_tokens: 64,
@@ -111,12 +111,9 @@ function App() {
       });
 
       const paletteResponse = colorCompletion.choices[0].message.content;
-
-      // Debug: log the response to check the format
       console.log("Palette Response:", paletteResponse);
 
-      // Extracting only the hex values
-      const hexColors = paletteResponse.match(/#[0-9A-Fa-f]{6}/g); // Use regex to find all hex codes
+      const hexColors = paletteResponse.match(/#[0-9A-Fa-f]{6}/g);
 
       if (hexColors && hexColors.length >= 5) {
         setColorOne(hexColors[0]);
@@ -128,7 +125,6 @@ function App() {
         console.error("Unexpected format: Not enough colors in response.");
       }
 
-      // Check the sentiment (optimistic/pessimistic)
       if (paletteResponse.includes("Optimistic")) {
         setWord("optimistic");
       } else if (paletteResponse.includes("Pessimistic")) {
@@ -145,22 +141,31 @@ function App() {
   };
 
   useEffect(() => {
-    if (aiOutput === undefined) return;
-    const newTypeIt = (
-      <TypeIt
-        className="theResponse"
-        options={{
-          afterComplete: () => {
-            document.querySelector(".ti-cursor").style.display = "none";
-          },
-          speed: 60,
-        }}
-      >
-        {aiOutput}
-      </TypeIt>
-    );
+    if (aiOutput) {
+      const newTypeIt = (
+        <TypeIt
+          key={typeIts.length}
+          className="theResponse"
+          options={{
+            afterComplete: () => {
+              document.querySelector(".ti-cursor").style.display = "none";
+            },
+            speed: 60,
+          }}
+        >
+          {aiOutput}
+        </TypeIt>
+      );
 
-    setTypeIts([...typeIts, newTypeIt]);
+      setTypeIts((prevTypeIts) => [...prevTypeIts, newTypeIt]);
+
+      api4.start({
+        delay: 0,
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+        config: { duration: 1500 },
+      });
+    }
   }, [aiOutput]);
 
   useEffect(() => {
@@ -170,122 +175,57 @@ function App() {
 
       api.start({
         delay: 100,
-
-        from: {
-          opacity: 1,
-        },
-        to: {
-          opacity: 0,
-        },
-        config: {
-          duration: 2000,
-        },
+        from: { opacity: 1 },
+        to: { opacity: 0 },
+        config: { duration: 2000 },
         onResolve: () => {
           setFirstInput(true);
         },
       });
       api2.start({
         delay: 100,
-
-        from: {
-          opacity: 1,
-        },
-        to: {
-          opacity: 0,
-        },
-        config: {
-          duration: 2000,
-        },
+        from: { opacity: 1 },
+        to: { opacity: 0 },
+        config: { duration: 2000 },
         onResolve: () => {
           setInputHeaderText(inputStore);
         },
       });
       api2.start({
         delay: 2000,
-
-        from: {
-          opacity: 0,
-        },
-        to: {
-          opacity: 1,
-        },
-        config: {
-          duration: 2000,
-        },
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+        config: { duration: 2000 },
       });
       api3.start({
         delay: 0,
-
-        from: {
-          opacity: 1,
-        },
-        to: {
-          opacity: 0,
-        },
-        config: {
-          duration: 1000,
-        },
-      });
-      api4.start({
-        delay: 1500,
-
-        from: {
-          opacity: 0,
-        },
-        to: {
-          opacity: 1,
-        },
-        config: {
-          duration: 1500,
-        },
+        from: { opacity: 1 },
+        to: { opacity: 0 },
+        config: { duration: 1000 },
       });
 
       generateResponse2(inputStore);
     }
   }, [inputStore]);
 
-  const [springs, api] = useSpring(() => ({
-    from: { opacity: 0 },
-  }));
-  const [springs2, api2] = useSpring(() => ({
-    from: { opacity: 0 },
-  }));
-  const [springs3, api3] = useSpring(() => ({
-    from: { opacity: 1 },
-  }));
-  const [springs4, api4] = useSpring(() => ({
-    from: { opacity: 1 },
-  }));
-  const [springs5, api5] = useSpring(() => ({
-    from: { opacity: 0 },
-  }));
+  const [springs, api] = useSpring(() => ({ from: { opacity: 0 } }));
+  const [springs2, api2] = useSpring(() => ({ from: { opacity: 0 } }));
+  const [springs3, api3] = useSpring(() => ({ from: { opacity: 1 } }));
+  const [springs4, api4] = useSpring(() => ({ from: { opacity: 1 } }));
+  const [springs5, api5] = useSpring(() => ({ from: { opacity: 0 } }));
 
   useEffect(() => {
     api.start({
       delay: 999,
-
-      from: {
-        opacity: 0,
-      },
-      to: {
-        opacity: 1,
-      },
-      config: {
-        duration: 7000,
-      },
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+      config: { duration: 7000 },
     });
     api5.start({
       delay: 1000,
-
-      from: {
-        opacity: 0,
-      },
-      to: {
-        opacity: 1,
-      },
-      config: {
-        duration: 3000,
-      },
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+      config: { duration: 3000 },
     });
   }, []);
 
@@ -299,39 +239,6 @@ function App() {
 
   return (
     <>
-      {/* Wordmark and Question Mark */}
-      <Image
-        className="wordmark"
-        sx={{
-          position: "absolute",
-          zIndex: 1,
-          bottom: 0,
-          margin: "2rem",
-        }}
-        src={"/wordmark.png"}
-        width={60}
-      />
-      <div
-        style={{
-          position: "absolute",
-          zIndex: 1,
-          bottom: 0,
-          right: 0,
-          padding: "1rem",
-        }}
-      >
-        <Group>
-          <ActionIcon color={"dark"} variant="transparent">
-            <VscQuestion
-              onClick={() => setAbout(true)}
-              className="questionIcon"
-              size={25}
-              style={{ fill: "white" }}
-            />
-          </ActionIcon>
-        </Group>
-      </div>
-
       {/* Header */}
       <div
         style={{
@@ -376,12 +283,10 @@ function App() {
                   />
                 </animated.div>
               ) : (
-                <animated.div style={springs3}>
-                  {typeIts.map((typeIt, index) => {
-                    if (index === typeIts.length - 1) {
-                      return <div key={index}>{typeIt}</div>;
-                    }
-                  })}
+                <animated.div style={springs4}>
+                  {typeIts.map((typeIt, index) => (
+                    <React.Fragment key={index}>{typeIt}</React.Fragment>
+                  ))}
                 </animated.div>
               )}
             </Container>
@@ -394,7 +299,40 @@ function App() {
         <InputBar word={word} />
       </animated.div>
 
-      {/* About  */}
+      {/* Wordmark and Question Mark */}
+      <Image
+        className="wordmark"
+        sx={{
+          position: "absolute",
+          zIndex: 1,
+          bottom: 0,
+          margin: "2rem",
+        }}
+        src={"/wordmark.png"}
+        width={60}
+      />
+      <div
+        style={{
+          position: "absolute",
+          zIndex: 1,
+          bottom: 0,
+          right: 0,
+          padding: "1rem",
+        }}
+      >
+        <Group>
+          <ActionIcon color={"dark"} variant="transparent">
+            <VscQuestion
+              onClick={() => setAbout(true)}
+              className="questionIcon"
+              size={25}
+              style={{ fill: "white" }}
+            />
+          </ActionIcon>
+        </Group>
+      </div>
+
+      {/* About Modal */}
       <Modal
         size={modalSize}
         overlayOpacity={0.9}
@@ -411,13 +349,11 @@ function App() {
         <CenterMantine mt={30}>
           <Stack spacing="xl" align="center">
             <Image src="/logo.png" width={60} mb={20} />
-
             <div style={{ fontSize: modalFont }} className="mobileModal">
               Stoca takes you on a reflective journey with a stoic philosopher
               AI while changing the colors & music to reflect your mood in real
               time
             </div>
-            {"\n"}
             <div style={{ width: "50%" }}>
               <div style={{ fontSize: 21.5 }} className="mobileModal">
                 Created by Tal Halperin
@@ -467,7 +403,7 @@ function App() {
         </CenterMantine>
       </Modal>
 
-      {/* Modal to display if user is on mobile */}
+      {/* Mobile Warning Modal */}
       {isMobile && (
         <Modal
           overlayOpacity={0.55}
