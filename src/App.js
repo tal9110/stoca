@@ -517,9 +517,9 @@ function App() {
       <Canvas
         shadows
         camera={{ position: [0, 0, 6.5], fov: 50 }}
-        // gl={{ antialias: false }}
+        gl={{ antialias: false }}
       >
-        <group position={[0.2, -1.5, 0]}>
+        {/* <group position={[0.2, -1.5, 0]}>
           <Scene
             firstClick={firstClick}
             colorOne={colorOne}
@@ -528,9 +528,9 @@ function App() {
             colorFour={colorFour}
             colorFive={colorFive}
           />
-        </group>
+        </group> */}
         {/* <Env enterIncrement={enterIncrement} /> */}
-        {!isMobile && <Postproduction />}
+        {/* {!isMobile && <Postproduction />} */}
       </Canvas>
     </>
   );
