@@ -8,9 +8,9 @@ export const VolumetricLightShader = {
 
     exposure: { value: 0.08 },
     decay: { value: 0.95 },
-    density: { value: 0.8 },
-    weight: { value: 0.5 },
-    samples: { value: 50 },
+    density: { value: 0.7 },
+    weight: { value: 0.35 },
+    samples: { value: 40 },
   },
 
   vertexShader: `

@@ -201,11 +201,11 @@ extend({ GradientMaterial });
 
 export default function GradientBackground(props) {
   const [colors, setColors] = useState([
-    new THREE.Color("#F2F2F2"),
-    new THREE.Color("#FECF9E"),
-    new THREE.Color("#F7A277"),
-    new THREE.Color("#D8A8A8"),
-    new THREE.Color("#A8D9D8"),
+    new THREE.Color("#303030"), // Darker gray
+    new THREE.Color("#4A3C2E"), // Darker beige
+    new THREE.Color("#5A3A2A"), // Darker brown
+    new THREE.Color("#4A3838"), // Darker red-gray
+    new THREE.Color("#385858"), // Darker teal
   ]);
 
   useEffect(() => {

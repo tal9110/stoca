@@ -20,7 +20,7 @@ export default function Scene(props) {
           <RandomizedLight
             amount={7}
             radius={3}
-            ambient={0.5}
+            ambient={0.4}
             position={[0, 6, -7]}
             bias={0.001}
           />
