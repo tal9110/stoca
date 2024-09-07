@@ -7,7 +7,6 @@ import InputBar from "./InputBar";
 import AudioController from "./AudioController";
 // import { Configuration, OpenAIApi } from "openai";
 import OpenAI from "openai";
-
 import {
   Image,
   Text,
@@ -36,7 +35,7 @@ function App() {
   const openai = new OpenAI({
     apiKey: process.env.REACT_APP_OPENAI_API_KEY, // API Key from environment variable
     organization: "org-xl3gZeUkDOQrIqypLNygYEtZ", // Your organization ID
-    project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY", // Your project ID
+    project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY",
   });
   const [colorOne, setColorOne] = useState("#F2F2F2");
   const [colorTwo, setColorTwo] = useState("#FECF9E");
