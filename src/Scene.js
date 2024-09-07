@@ -18,7 +18,7 @@ export default function Scene(props) {
       >
         <group ref={randomLight}>
           <RandomizedLight
-            amount={8}
+            amount={7}
             radius={3}
             ambient={0.5}
             position={[0, 6, -7]}

@@ -6,7 +6,7 @@ export const VolumetricLightShader = {
     lightPosition: { value: new THREE.Vector2(0.5, 0.75) },
     // lightPosition: { value: new THREE.Vector2(-10, 20) },
 
-    exposure: { value: 0.1 },
+    exposure: { value: 0.08 },
     decay: { value: 0.95 },
     density: { value: 0.8 },
     weight: { value: 0.5 },

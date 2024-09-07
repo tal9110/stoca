@@ -201,11 +201,11 @@ extend({ GradientMaterial });
 
 export default function GradientBackground(props) {
   const [colors, setColors] = useState([
-    new THREE.Color("#FFFFFF"),
-    new THREE.Color("#000000"),
-    new THREE.Color("#FFFFFF"),
-    new THREE.Color("#000000"),
-    new THREE.Color("#FFFFFF"),
+    new THREE.Color("#F2F2F2"),
+    new THREE.Color("#FECF9E"),
+    new THREE.Color("#F7A277"),
+    new THREE.Color("#D8A8A8"),
+    new THREE.Color("#A8D9D8"),
   ]);
 
   useEffect(() => {
@@ -332,7 +332,7 @@ export default function GradientBackground(props) {
         penumbra={0.5}
         ref={light}
         castShadow
-        intensity={1}
+        intensity={0.9}
         shadow-mapSize={1024}
         shadow-bias={-0.001}
       >
