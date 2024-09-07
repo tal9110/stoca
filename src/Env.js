@@ -79,5 +79,5 @@ export default function Env(props) {
     }
   });
 
-  return <Environment preset={"night"} background blur={0.65} />;
+  return <Environment preset={"night"} blur={0.65} background={false} />;
 }

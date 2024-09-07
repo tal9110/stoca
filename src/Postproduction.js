@@ -27,7 +27,7 @@ export default function Postproduction() {
   return (
     <>
       <mesh layers={OCCLUSION_LAYER} position={[0, 1.5, -5]}>
-        <sphereGeometry args={[1, 32, 32]} />
+        <sphereGeometry args={[3, 32, 32]} />
         <meshBasicMaterial />
       </mesh>
       <Effects

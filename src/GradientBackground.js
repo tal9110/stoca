@@ -345,7 +345,7 @@ export default function GradientBackground(props) {
         <sphereGeometry args={[0.75, 2048, 2048]} />
         <gradientMaterial
           side={THREE.BackSide}
-          transparent={true}
+          // transparent={true}
           extensions={{
             derivatives: "#extension GL_OES_standard_derivatives : enable",
           }}

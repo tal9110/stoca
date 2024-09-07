@@ -5,7 +5,6 @@ import { useSpring, animated } from "@react-spring/web";
 import { PulseLoader } from "react-spinners";
 import InputBar from "./InputBar";
 import AudioController from "./AudioController";
-// import { Configuration, OpenAIApi } from "openai";
 import OpenAI from "openai";
 import {
   Image,
@@ -29,9 +28,6 @@ import Postproduction from "./Postproduction";
 import TypeIt from "typeit-react";
 
 function App() {
-  // const configuration = new Configuration({
-  //   apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-  // });
   const openai = new OpenAI({
     apiKey: process.env.REACT_APP_OPENAI_API_KEY, // API Key from environment variable
     organization: "org-xl3gZeUkDOQrIqypLNygYEtZ", // Your organization ID
@@ -501,7 +497,7 @@ function App() {
       )}
 
       {/* React Three Fiber Canvas */}
-      {/* <Canvas
+      <Canvas
         shadows
         camera={{ position: [0, 0, 6.5], fov: 50 }}
         gl={{ antialias: false }}
@@ -518,7 +514,7 @@ function App() {
         </group>
         <Env enterIncrement={enterIncrement} />
         {!isMobile && <Postproduction />}
-      </Canvas> */}
+      </Canvas>
     </>
   );
 }
