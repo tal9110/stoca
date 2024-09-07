@@ -86,13 +86,17 @@ function App() {
       console.error("Error with OpenAI API: ", error);
     }
 
-    // Color palette API request (if required)
-    const response2 = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt:
-        "Five different hex value colors that are a color palette for " +
-        inputt +
-        " , and then on a new line describe that sentiment as either optimistic or pessimistic: \n\n",
+    // Corrected Color palette API request
+    const response2 = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo", // or gpt-4 if available
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a color palette generator. Provide five different hex value colors that create a palette matching the input's sentiment. Then describe that sentiment as either optimistic or pessimistic.",
+        },
+        { role: "user", content: inputt }, // User input for color generation
+      ],
       temperature: 0,
       max_tokens: 64,
       top_p: 1.0,
@@ -100,7 +104,7 @@ function App() {
       presence_penalty: 0.0,
     });
 
-    let split = response2.data.choices[0].text
+    let split = response2.data.choices[0].message.content
       .split(",")
       .map((color) => color.split("#")[1]);
 
