@@ -371,9 +371,11 @@ function App() {
                 >
                   How do you feel right now?
                 </TypeIt> */}
-                <div>
-                  <p>{aiOutput}</p>
-                </div>
+                {aiOutput && (
+                  <div>
+                    <p>{aiOutput}</p>
+                  </div>
+                )}
               </animated.div>
             )}
             <Container mt={40}>
