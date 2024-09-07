@@ -147,17 +147,19 @@ function App() {
       );
     }
   };
-
   useEffect(() => {
     console.log("aiOutput updated:", aiOutput);
 
     if (aiOutput === undefined) return;
+
+    // Create the new TypeIt component
     const newTypeIt = (
       <TypeIt
         className="theResponse"
         options={{
           afterComplete: () => {
-            document.querySelector(".ti-cursor").style.display = "none";
+            const cursor = document.querySelector(".ti-cursor");
+            if (cursor) cursor.style.display = "none";
           },
           speed: 60,
         }}
@@ -166,8 +168,13 @@ function App() {
       </TypeIt>
     );
 
+    // Log the state before updating
     console.log("typeIts before:", typeIts);
-    setTypeIts([...typeIts, newTypeIt]);
+
+    // Update the typeIts state immutably
+    setTypeIts((prevTypeIts) => [...prevTypeIts, newTypeIt]);
+
+    // Log the updated state
     console.log("typeIts after:", [...typeIts, newTypeIt]);
   }, [aiOutput]);
 
@@ -360,7 +367,7 @@ function App() {
               </Container>
             ) : (
               <animated.div style={springs}>
-                {/* <TypeIt
+                <TypeIt
                   className="theHeader"
                   options={{
                     afterComplete: () => {
@@ -370,12 +377,7 @@ function App() {
                   }}
                 >
                   How do you feel right now?
-                </TypeIt> */}
-                {aiOutput && (
-                  <div>
-                    <p>{aiOutput}</p>
-                  </div>
-                )}
+                </TypeIt>
               </animated.div>
             )}
             <Container mt={40}>
@@ -390,11 +392,13 @@ function App() {
                 </animated.div>
               ) : (
                 <animated.div style={springs3}>
-                  {typeIts.map((typeIt, index) => {
-                    if (index === typeIts.length - 1) {
-                      return <div key={index}>{typeIt}</div>;
-                    }
-                  })}
+                  {typeIts.length > 0 ? (
+                    typeIts.map((typeIt, index) => (
+                      <div key={index}>{typeIt}</div>
+                    ))
+                  ) : (
+                    <p>No responses yet.</p>
+                  )}
                 </animated.div>
               )}
             </Container>
