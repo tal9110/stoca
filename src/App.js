@@ -56,6 +56,8 @@ function App() {
   const [modalFont, setModalFont] = useState(26);
   const [typeIts, setTypeIts] = useState([]);
 
+  const [aiResponses, setAiResponses] = useState([]);
+
   const generateResponse2 = async (inputt) => {
     setFirstClick(firstClick + 1);
     setLoading(true);
@@ -74,13 +76,16 @@ function App() {
         presence_penalty: 0.75,
       });
 
-      const aiResponse = completion.choices[0].message.content;
+      const aiResponse = completion.choices[0].message.content.replace(
+        /^AI:\s*/,
+        ""
+      );
       console.log("AI Response:", aiResponse);
 
-      setAiOutput(aiResponse);
-
-      const appended = finalPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse;
-      setFinalPrompt(appended);
+      setAiResponses((prevResponses) => [...prevResponses, aiResponse]);
+      setFinalPrompt(
+        (prevPrompt) => prevPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse
+      );
 
       setLoading(false);
     } catch (error) {
@@ -141,10 +146,11 @@ function App() {
   };
 
   useEffect(() => {
-    if (aiOutput) {
+    if (aiResponses.length > 0) {
+      const latestResponse = aiResponses[aiResponses.length - 1];
       const newTypeIt = (
         <TypeIt
-          key={typeIts.length}
+          key={aiResponses.length}
           className="theResponse"
           options={{
             afterComplete: () => {
@@ -153,11 +159,11 @@ function App() {
             speed: 60,
           }}
         >
-          {aiOutput}
+          {latestResponse}
         </TypeIt>
       );
 
-      setTypeIts((prevTypeIts) => [...prevTypeIts, newTypeIt]);
+      setTypeIts([newTypeIt]); // Only keep the latest response
 
       api4.start({
         delay: 0,
@@ -166,7 +172,7 @@ function App() {
         config: { duration: 1500 },
       });
     }
-  }, [aiOutput]);
+  }, [aiResponses]);
 
   useEffect(() => {
     setEnterIncrement(enterIncrement + 1);
@@ -284,9 +290,7 @@ function App() {
                 </animated.div>
               ) : (
                 <animated.div style={springs4}>
-                  {typeIts.map((typeIt, index) => (
-                    <React.Fragment key={index}>{typeIt}</React.Fragment>
-                  ))}
+                  {typeIts[0]} {/* Only display the latest response */}
                 </animated.div>
               )}
             </Container>
