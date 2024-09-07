@@ -397,7 +397,7 @@ function App() {
                       <div key={index}>{typeIt}</div>
                     ))
                   ) : (
-                    <p>No responses yet.</p>
+                    <> </>
                   )}
                 </animated.div>
               )}
@@ -514,7 +514,7 @@ function App() {
       )}
 
       {/* React Three Fiber Canvas */}
-      {/* <Canvas
+      <Canvas
         shadows
         camera={{ position: [0, 0, 6.5], fov: 50 }}
         gl={{ antialias: false }}
@@ -531,7 +531,7 @@ function App() {
         </group>
         <Env enterIncrement={enterIncrement} />
         {!isMobile && <Postproduction />}
-      </Canvas> */}
+      </Canvas>
     </>
   );
 }
