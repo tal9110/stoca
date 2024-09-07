@@ -82,13 +82,15 @@ function App() {
       const aiResponse = completion.choices[0].message.content;
       setAiOutput(aiResponse);
 
-      // Append the AI response to the conversation context
       const appended = finalPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse;
       setFinalPrompt(appended);
 
       setLoading(false);
     } catch (error) {
-      console.error("Error with OpenAI API: ", error);
+      console.error(
+        "Error with OpenAI API:",
+        error.response?.data || error.message
+      );
     }
 
     // Generate the Color Palette using gpt-3.5-turbo
@@ -111,25 +113,36 @@ function App() {
       });
 
       const paletteResponse = colorCompletion.choices[0].message.content;
+
+      // Debug: log the response to check the format
       console.log("Palette Response:", paletteResponse);
 
-      const split = paletteResponse
-        .split(",")
-        .map((color) => color.split("#")[1]);
+      // Extracting only the hex values
+      const hexColors = paletteResponse.match(/#[0-9A-Fa-f]{6}/g); // Use regex to find all hex codes
 
-      setColorOne("#" + split[0].slice(0, 6));
-      setColorTwo("#" + split[1].slice(0, 6));
-      setColorThree("#" + split[2].slice(0, 6));
-      setColorFour("#" + split[3].slice(0, 6));
-      setColorFive("#" + split[4].slice(0, 6));
+      if (hexColors && hexColors.length >= 5) {
+        setColorOne(hexColors[0]);
+        setColorTwo(hexColors[1]);
+        setColorThree(hexColors[2]);
+        setColorFour(hexColors[3]);
+        setColorFive(hexColors[4]);
+      } else {
+        console.error("Unexpected format: Not enough colors in response.");
+      }
 
-      if (paletteResponse.trim().includes("Optimistic")) {
+      // Check the sentiment (optimistic/pessimistic)
+      if (paletteResponse.includes("Optimistic")) {
         setWord("optimistic");
-      } else if (paletteResponse.trim().includes("Pessimistic")) {
+      } else if (paletteResponse.includes("Pessimistic")) {
         setWord("pessimistic");
+      } else {
+        console.error("Sentiment not found in response.");
       }
     } catch (error) {
-      console.error("Error with color palette generation: ", error);
+      console.error(
+        "Error with color palette generation:",
+        error.response?.data || error.message
+      );
     }
   };
 
