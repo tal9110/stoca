@@ -26,18 +26,19 @@ import Postproduction from "./Postproduction";
 import TypeIt from "typeit-react";
 
 function App() {
-  const openai = new OpenAI({
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-    organization: "org-xl3gZeUkDOQrIqypLNygYEtZ",
-    project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY",
-    dangerouslyAllowBrowser: true,
-  });
+  // const openai = new OpenAI({
+  //   apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+  //   organization: "org-xl3gZeUkDOQrIqypLNygYEtZ",
+  //   project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY",
+  //   dangerouslyAllowBrowser: true,
+  // });
 
-  const [colorOne, setColorOne] = useState("#F2F2F2");
-  const [colorTwo, setColorTwo] = useState("#FECF9E");
-  const [colorThree, setColorThree] = useState("#F7A277");
-  const [colorFour, setColorFour] = useState("#D8A8A8");
-  const [colorFive, setColorFive] = useState("#A8D9D8");
+  const [colorOne, setColorOne] = useState("#FF6F61"); // Soft coral
+  const [colorTwo, setColorTwo] = useState("#F96D00"); // Warm sunset orange
+  const [colorThree, setColorThree] = useState("#FFD275"); // Golden yellow
+  const [colorFour, setColorFour] = useState("#D64045"); // Deep red-orange
+  const [colorFive, setColorFive] = useState("#FF9A8B"); // Light peach-pink
+
   const [word, setWord] = useState("");
 
   const [finalPrompt, setFinalPrompt] = useState(
@@ -58,161 +59,161 @@ function App() {
 
   const [aiResponses, setAiResponses] = useState([]);
 
-  const generateResponse2 = async (inputt) => {
-    setFirstClick(firstClick + 1);
-    setLoading(true);
+  // const generateResponse2 = async (inputt) => {
+  //   setFirstClick(firstClick + 1);
+  //   setLoading(true);
 
-    try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          { role: "system", content: finalPrompt },
-          { role: "user", content: inputt },
-        ],
-        temperature: 0.9,
-        max_tokens: 300,
-        top_p: 1,
-        frequency_penalty: 0.76,
-        presence_penalty: 0.75,
-      });
+  //   try {
+  //     const completion = await openai.chat.completions.create({
+  //       model: "gpt-3.5-turbo",
+  //       messages: [
+  //         { role: "system", content: finalPrompt },
+  //         { role: "user", content: inputt },
+  //       ],
+  //       temperature: 0.9,
+  //       max_tokens: 300,
+  //       top_p: 1,
+  //       frequency_penalty: 0.76,
+  //       presence_penalty: 0.75,
+  //     });
 
-      const aiResponse = completion.choices[0].message.content.replace(
-        /^AI:\s*/,
-        ""
-      );
-      console.log("AI Response:", aiResponse);
+  //     const aiResponse = completion.choices[0].message.content.replace(
+  //       /^AI:\s*/,
+  //       ""
+  //     );
+  //     console.log("AI Response:", aiResponse);
 
-      setAiResponses((prevResponses) => [...prevResponses, aiResponse]);
-      setFinalPrompt(
-        (prevPrompt) => prevPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse
-      );
+  //     setAiResponses((prevResponses) => [...prevResponses, aiResponse]);
+  //     setFinalPrompt(
+  //       (prevPrompt) => prevPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse
+  //     );
 
-      setLoading(false);
-    } catch (error) {
-      console.error(
-        "Error with OpenAI API:",
-        error.response?.data || error.message
-      );
-      setLoading(false);
-    }
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error(
+  //       "Error with OpenAI API:",
+  //       error.response?.data || error.message
+  //     );
+  //     setLoading(false);
+  //   }
 
-    // Generate the Color Palette
-    try {
-      const colorCompletion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a color palette generator. Provide five different hex value colors that create a palette matching the input's sentiment. Then describe that sentiment as either optimistic or pessimistic.",
-          },
-          { role: "user", content: inputt },
-        ],
-        temperature: 0,
-        max_tokens: 64,
-        top_p: 1.0,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0,
-      });
+  //   // Generate the Color Palette
+  //   try {
+  //     const colorCompletion = await openai.chat.completions.create({
+  //       model: "gpt-3.5-turbo",
+  //       messages: [
+  //         {
+  //           role: "system",
+  //           content:
+  //             "You are a color palette generator. Provide five different hex value colors that create a palette matching the input's sentiment. Then describe that sentiment as either optimistic or pessimistic.",
+  //         },
+  //         { role: "user", content: inputt },
+  //       ],
+  //       temperature: 0,
+  //       max_tokens: 64,
+  //       top_p: 1.0,
+  //       frequency_penalty: 0.0,
+  //       presence_penalty: 0.0,
+  //     });
 
-      const paletteResponse = colorCompletion.choices[0].message.content;
-      console.log("Palette Response:", paletteResponse);
+  //     const paletteResponse = colorCompletion.choices[0].message.content;
+  //     console.log("Palette Response:", paletteResponse);
 
-      const hexColors = paletteResponse.match(/#[0-9A-Fa-f]{6}/g);
+  //     const hexColors = paletteResponse.match(/#[0-9A-Fa-f]{6}/g);
 
-      if (hexColors && hexColors.length >= 5) {
-        setColorOne(hexColors[0]);
-        setColorTwo(hexColors[1]);
-        setColorThree(hexColors[2]);
-        setColorFour(hexColors[3]);
-        setColorFive(hexColors[4]);
-      } else {
-        console.error("Unexpected format: Not enough colors in response.");
-      }
+  //     if (hexColors && hexColors.length >= 5) {
+  //       setColorOne(hexColors[0]);
+  //       setColorTwo(hexColors[1]);
+  //       setColorThree(hexColors[2]);
+  //       setColorFour(hexColors[3]);
+  //       setColorFive(hexColors[4]);
+  //     } else {
+  //       console.error("Unexpected format: Not enough colors in response.");
+  //     }
 
-      if (paletteResponse.includes("Optimistic")) {
-        setWord("optimistic");
-      } else if (paletteResponse.includes("Pessimistic")) {
-        setWord("pessimistic");
-      } else {
-        console.error("Sentiment not found in response.");
-      }
-    } catch (error) {
-      console.error(
-        "Error with color palette generation:",
-        error.response?.data || error.message
-      );
-    }
-  };
+  //     if (paletteResponse.includes("Optimistic")) {
+  //       setWord("optimistic");
+  //     } else if (paletteResponse.includes("Pessimistic")) {
+  //       setWord("pessimistic");
+  //     } else {
+  //       console.error("Sentiment not found in response.");
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "Error with color palette generation:",
+  //       error.response?.data || error.message
+  //     );
+  //   }
+  // };
 
-  useEffect(() => {
-    if (aiResponses.length > 0) {
-      const latestResponse = aiResponses[aiResponses.length - 1];
-      const newTypeIt = (
-        <TypeIt
-          key={aiResponses.length}
-          className="theResponse"
-          options={{
-            afterComplete: () => {
-              document.querySelector(".ti-cursor").style.display = "none";
-            },
-            speed: 60,
-          }}
-        >
-          {latestResponse}
-        </TypeIt>
-      );
+  // useEffect(() => {
+  //   if (aiResponses.length > 0) {
+  //     const latestResponse = aiResponses[aiResponses.length - 1];
+  //     const newTypeIt = (
+  //       <TypeIt
+  //         key={aiResponses.length}
+  //         className="theResponse"
+  //         options={{
+  //           afterComplete: () => {
+  //             document.querySelector(".ti-cursor").style.display = "none";
+  //           },
+  //           speed: 60,
+  //         }}
+  //       >
+  //         {latestResponse}
+  //       </TypeIt>
+  //     );
 
-      setTypeIts([newTypeIt]); // Only keep the latest response
+  //     setTypeIts([newTypeIt]); // Only keep the latest response
 
-      api4.start({
-        delay: 0,
-        from: { opacity: 0 },
-        to: { opacity: 1 },
-        config: { duration: 1500 },
-      });
-    }
-  }, [aiResponses]);
+  //     api4.start({
+  //       delay: 0,
+  //       from: { opacity: 0 },
+  //       to: { opacity: 1 },
+  //       config: { duration: 1500 },
+  //     });
+  //   }
+  // }, [aiResponses]);
 
-  useEffect(() => {
-    setEnterIncrement(enterIncrement + 1);
-    if (inputStore.length > 0) {
-      setLoading(true);
+  // useEffect(() => {
+  //   setEnterIncrement(enterIncrement + 1);
+  //   if (inputStore.length > 0) {
+  //     setLoading(true);
 
-      api.start({
-        delay: 100,
-        from: { opacity: 1 },
-        to: { opacity: 0 },
-        config: { duration: 2000 },
-        onResolve: () => {
-          setFirstInput(true);
-        },
-      });
-      api2.start({
-        delay: 100,
-        from: { opacity: 1 },
-        to: { opacity: 0 },
-        config: { duration: 2000 },
-        onResolve: () => {
-          setInputHeaderText(inputStore);
-        },
-      });
-      api2.start({
-        delay: 2000,
-        from: { opacity: 0 },
-        to: { opacity: 1 },
-        config: { duration: 2000 },
-      });
-      api3.start({
-        delay: 0,
-        from: { opacity: 1 },
-        to: { opacity: 0 },
-        config: { duration: 1000 },
-      });
+  //     api.start({
+  //       delay: 100,
+  //       from: { opacity: 1 },
+  //       to: { opacity: 0 },
+  //       config: { duration: 2000 },
+  //       onResolve: () => {
+  //         setFirstInput(true);
+  //       },
+  //     });
+  //     api2.start({
+  //       delay: 100,
+  //       from: { opacity: 1 },
+  //       to: { opacity: 0 },
+  //       config: { duration: 2000 },
+  //       onResolve: () => {
+  //         setInputHeaderText(inputStore);
+  //       },
+  //     });
+  //     api2.start({
+  //       delay: 2000,
+  //       from: { opacity: 0 },
+  //       to: { opacity: 1 },
+  //       config: { duration: 2000 },
+  //     });
+  //     api3.start({
+  //       delay: 0,
+  //       from: { opacity: 1 },
+  //       to: { opacity: 0 },
+  //       config: { duration: 1000 },
+  //     });
 
-      generateResponse2(inputStore);
-    }
-  }, [inputStore]);
+  //     generateResponse2(inputStore);
+  //   }
+  // }, [inputStore]);
 
   const [springs, api] = useSpring(() => ({ from: { opacity: 0 } }));
   const [springs2, api2] = useSpring(() => ({ from: { opacity: 0 } }));
