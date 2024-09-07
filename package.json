@@ -16,7 +16,7 @@
     "gsap": "^3.11.4",
     "howler": "^2.2.3",
     "maath": "^0.4.2",
-    "openai": "^3.3.0",
+    "openai": "^4.0.0",
     "react": "^18.2.0",
     "react-device-detect": "^2.2.2",
     "react-dom": "^18.2.0",
