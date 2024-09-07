@@ -61,11 +61,11 @@ function App() {
     setFirstClick(firstClick + 1);
 
     try {
-      const response = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo", // or gpt-4 depending on your subscription
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: finalPrompt }, // Setting the system message
-          { role: "user", content: inputt }, // User input
+          { role: "system", content: finalPrompt }, // Setting the role of the AI
+          { role: "user", content: inputt }, // User input message
         ],
         temperature: 0.9,
         max_tokens: 300,
@@ -74,10 +74,10 @@ function App() {
         presence_penalty: 0.75,
       });
 
-      const aiResponse = response.data.choices[0].message.content;
+      const aiResponse = completion.choices[0].message.content;
       setAiOutput(aiResponse);
 
-      // Appending the AI response to the conversation context
+      // Append the AI response to the conversation context
       const appended = finalPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse;
       setFinalPrompt(appended);
 
@@ -86,38 +86,43 @@ function App() {
       console.error("Error with OpenAI API: ", error);
     }
 
-    // Corrected Color palette API request
-    const response2 = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo", // or gpt-4 if available
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a color palette generator. Provide five different hex value colors that create a palette matching the input's sentiment. Then describe that sentiment as either optimistic or pessimistic.",
-        },
-        { role: "user", content: inputt }, // User input for color generation
-      ],
-      temperature: 0,
-      max_tokens: 64,
-      top_p: 1.0,
-      frequency_penalty: 0.0,
-      presence_penalty: 0.0,
-    });
+    // Generate the Color Palette using gpt-3.5-turbo
+    try {
+      const colorCompletion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a color palette generator. Provide five different hex value colors that create a palette matching the input's sentiment. Then describe that sentiment as either optimistic or pessimistic.",
+          },
+          { role: "user", content: inputt }, // User input for color generation
+        ],
+        temperature: 0,
+        max_tokens: 64,
+        top_p: 1.0,
+        frequency_penalty: 0.0,
+        presence_penalty: 0.0,
+      });
 
-    let split = response2.data.choices[0].message.content
-      .split(",")
-      .map((color) => color.split("#")[1]);
+      const paletteResponse = colorCompletion.choices[0].message.content;
+      const split = paletteResponse
+        .split(",")
+        .map((color) => color.split("#")[1]);
 
-    setColorOne("#" + split[0].slice(0, 6));
-    setColorTwo("#" + split[1].slice(0, 6));
-    setColorThree("#" + split[2].slice(0, 6));
-    setColorFour("#" + split[3].slice(0, 6));
-    setColorFive("#" + split[4].slice(0, 6));
+      setColorOne("#" + split[0].slice(0, 6));
+      setColorTwo("#" + split[1].slice(0, 6));
+      setColorThree("#" + split[2].slice(0, 6));
+      setColorFour("#" + split[3].slice(0, 6));
+      setColorFive("#" + split[4].slice(0, 6));
 
-    if (split[4].trim().includes("Optimistic")) {
-      setWord("optimistic");
-    } else if (split[4].trim().includes("Pessimistic")) {
-      setWord("pessimistic");
+      if (paletteResponse.trim().includes("Optimistic")) {
+        setWord("optimistic");
+      } else if (paletteResponse.trim().includes("Pessimistic")) {
+        setWord("pessimistic");
+      }
+    } catch (error) {
+      console.error("Error with color palette generation: ", error);
     }
   };
 
