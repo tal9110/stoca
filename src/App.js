@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
-import OpenAI from "openai";
+import useStore from "./store";
 import { useSpring, animated } from "@react-spring/web";
 import { PulseLoader } from "react-spinners";
-import { isMobile } from "react-device-detect";
-import TypeIt from "typeit-react";
+import InputBar from "./InputBar";
+import OpenAI from "openai";
 import {
   Image,
   Text,
@@ -15,74 +15,60 @@ import {
   Stack,
   Modal,
 } from "@mantine/core";
+import { isMobile } from "react-device-detect";
 import { VscGithub, VscQuestion } from "react-icons/vsc";
 import { BsFillArrowRightCircleFill } from "react-icons/bs";
 import { FaLinkedin } from "react-icons/fa";
 import { MdOutlineMail } from "react-icons/md";
-
-import useStore from "./store";
-import InputBar from "./InputBar";
 import Env from "./Env";
 import Scene from "./Scene";
 import Postproduction from "./Postproduction";
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-  organization: "org-xl3gZeUkDOQrIqypLNygYEtZ",
-  project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY",
-  dangerouslyAllowBrowser: true,
-});
+import TypeIt from "typeit-react";
 
 function App() {
-  // State for color palette
-  const [colorOne, setColorOne] = useState("#FF6F61");
-  const [colorTwo, setColorTwo] = useState("#F96D00");
-  const [colorThree, setColorThree] = useState("#FFD275");
-  const [colorFour, setColorFour] = useState("#D64045");
-  const [colorFive, setColorFive] = useState("#FF9A8B");
+  const openai = new OpenAI({
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+    organization: "org-xl3gZeUkDOQrIqypLNygYEtZ",
+    project: "proj_yTxEfQnw1Cq8uGJiGfLSvYaY",
+    dangerouslyAllowBrowser: true,
+  });
 
-  // State for AI conversation
+  const [colorOne, setColorOne] = useState("#FF6F61"); // Soft coral
+  const [colorTwo, setColorTwo] = useState("#F96D00"); // Warm sunset orange
+  const [colorThree, setColorThree] = useState("#FFD275"); // Golden yellow
+  const [colorFour, setColorFour] = useState("#D64045"); // Deep red-orange
+  const [colorFive, setColorFive] = useState("#FF9A8B"); // Light peach-pink
+
   const [word, setWord] = useState("");
+
   const [finalPrompt, setFinalPrompt] = useState(
     "The following is a conversation with an AI Stoic Philosopher. The philosopher is helpful, creative, clever, friendly, gives brief stoic advice, and asks deep questions.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
   );
   const [firstClick, setFirstClick] = useState(0);
-  const [aiResponses, setAiResponses] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  // UI state
+  const [aiOutput, setAiOutput] = useState("");
+  const inputStore = useStore((state) => state.inputStore);
   const [firstInput, setFirstInput] = useState(false);
   const [inputHeaderText, setInputHeaderText] = useState("");
   const [enterIncrement, setEnterIncrement] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const [about, setAbout] = useState(false);
   const [modalSize, setModalSize] = useState("50%");
   const [modalFont, setModalFont] = useState(26);
   const [typeIts, setTypeIts] = useState([]);
 
-  // Get input from store
-  const inputStore = useStore((state) => state.inputStore);
+  const [aiResponses, setAiResponses] = useState([]);
 
-  // Animation springs
-  const [springs, api] = useSpring(() => ({ from: { opacity: 0 } }));
-  const [springs2, api2] = useSpring(() => ({ from: { opacity: 0 } }));
-  const [springs3, api3] = useSpring(() => ({ from: { opacity: 1 } }));
-  const [springs4, api4] = useSpring(() => ({ from: { opacity: 1 } }));
-  const [springs5, api5] = useSpring(() => ({ from: { opacity: 0 } }));
-
-  // Generate AI response
-  const generateResponse = async (input) => {
+  const generateResponse2 = async (inputt) => {
     setFirstClick(firstClick + 1);
     setLoading(true);
 
     try {
-      // Generate AI response
       const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
           { role: "system", content: finalPrompt },
-          { role: "user", content: input },
+          { role: "user", content: inputt },
         ],
         temperature: 0.9,
         max_tokens: 300,
@@ -95,13 +81,24 @@ function App() {
         /^AI:\s*/,
         ""
       );
+      console.log("AI Response:", aiResponse);
 
       setAiResponses((prevResponses) => [...prevResponses, aiResponse]);
       setFinalPrompt(
-        (prevPrompt) => prevPrompt + "\nHuman:" + input + "\nAI:" + aiResponse
+        (prevPrompt) => prevPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse
       );
 
-      // Generate color palette
+      setLoading(false);
+    } catch (error) {
+      console.error(
+        "Error with OpenAI API:",
+        error.response?.data || error.message
+      );
+      setLoading(false);
+    }
+
+    // Generate the Color Palette
+    try {
       const colorCompletion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
@@ -110,7 +107,7 @@ function App() {
             content:
               "You are a color palette generator. Provide five different hex value colors that create a palette matching the input's sentiment. Then describe that sentiment as either optimistic or pessimistic.",
           },
-          { role: "user", content: input },
+          { role: "user", content: inputt },
         ],
         temperature: 0,
         max_tokens: 64,
@@ -120,6 +117,8 @@ function App() {
       });
 
       const paletteResponse = colorCompletion.choices[0].message.content;
+      console.log("Palette Response:", paletteResponse);
+
       const hexColors = paletteResponse.match(/#[0-9A-Fa-f]{6}/g);
 
       if (hexColors && hexColors.length >= 5) {
@@ -128,19 +127,25 @@ function App() {
         setColorThree(hexColors[2]);
         setColorFour(hexColors[3]);
         setColorFive(hexColors[4]);
+      } else {
+        console.error("Unexpected format: Not enough colors in response.");
       }
 
-      setWord(
-        paletteResponse.includes("Optimistic") ? "optimistic" : "pessimistic"
-      );
+      if (paletteResponse.includes("Optimistic")) {
+        setWord("optimistic");
+      } else if (paletteResponse.includes("Pessimistic")) {
+        setWord("pessimistic");
+      } else {
+        console.error("Sentiment not found in response.");
+      }
     } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
+      console.error(
+        "Error with color palette generation:",
+        error.response?.data || error.message
+      );
     }
-
-    setLoading(false);
   };
 
-  // Typewriter effect for AI responses
   useEffect(() => {
     if (aiResponses.length > 0) {
       const latestResponse = aiResponses[aiResponses.length - 1];
@@ -159,7 +164,7 @@ function App() {
         </TypeIt>
       );
 
-      setTypeIts([newTypeIt]);
+      setTypeIts([newTypeIt]); // Only keep the latest response
 
       api4.start({
         delay: 0,
@@ -171,8 +176,8 @@ function App() {
   }, [aiResponses]);
 
   useEffect(() => {
+    setEnterIncrement(enterIncrement + 1);
     if (inputStore.length > 0) {
-      setEnterIncrement((prev) => prev + 1);
       setLoading(true);
 
       api.start({
@@ -180,24 +185,25 @@ function App() {
         from: { opacity: 1 },
         to: { opacity: 0 },
         config: { duration: 2000 },
-        onResolve: () => setFirstInput(true),
+        onResolve: () => {
+          setFirstInput(true);
+        },
       });
-
       api2.start({
         delay: 100,
         from: { opacity: 1 },
         to: { opacity: 0 },
         config: { duration: 2000 },
-        onResolve: () => setInputHeaderText(inputStore),
+        onResolve: () => {
+          setInputHeaderText(inputStore);
+        },
       });
-
       api2.start({
         delay: 2000,
         from: { opacity: 0 },
         to: { opacity: 1 },
         config: { duration: 2000 },
       });
-
       api3.start({
         delay: 0,
         from: { opacity: 1 },
@@ -205,9 +211,15 @@ function App() {
         config: { duration: 1000 },
       });
 
-      generateResponse(inputStore);
+      generateResponse2(inputStore);
     }
   }, [inputStore]);
+
+  const [springs, api] = useSpring(() => ({ from: { opacity: 0 } }));
+  const [springs2, api2] = useSpring(() => ({ from: { opacity: 0 } }));
+  const [springs3, api3] = useSpring(() => ({ from: { opacity: 1 } }));
+  const [springs4, api4] = useSpring(() => ({ from: { opacity: 1 } }));
+  const [springs5, api5] = useSpring(() => ({ from: { opacity: 0 } }));
 
   useEffect(() => {
     api.start({
@@ -230,7 +242,7 @@ function App() {
       setModalSize("100%");
       setModalFont(18);
     }
-  }, []);
+  }, [isMobile]);
 
   return (
     <>
@@ -278,7 +290,9 @@ function App() {
                   />
                 </animated.div>
               ) : (
-                <animated.div style={springs4}>{typeIts[0]}</animated.div>
+                <animated.div style={springs4}>
+                  {typeIts[0]} {/* Only display the latest response */}
+                </animated.div>
               )}
             </Container>
           </Stack>
