@@ -60,16 +60,36 @@ function App() {
     setFirstClick(firstClick + 1);
     const combined = finalPrompt + "\nHuman:" + inputt + "\nAI:";
 
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: combined,
-      temperature: 0.9,
-      max_tokens: 300,
-      top_p: 1,
-      frequency_penalty: 0.76,
-      presence_penalty: 0.75,
-      stop: [" Human:", " AI:"],
-    });
+    try {
+      const response = await openai.createChatCompletion({
+        model: "gpt-4", // or gpt-4-turbo for more efficient response
+        messages: [
+          { role: "system", content: finalPrompt }, // System message setting the role
+          { role: "user", content: inputt }, // User message for current input
+        ],
+        temperature: 0.9,
+        max_tokens: 300,
+        top_p: 1,
+        frequency_penalty: 0.76,
+        presence_penalty: 0.75,
+      });
+
+      const aiResponse = response.data.choices[0].message.content;
+      setAiOutput(aiResponse);
+
+      // Appending to finalPrompt to retain conversation context
+      const appended = combined + aiResponse;
+      setFinalPrompt(appended);
+
+      // Trigger animations
+      api4.start({ opacity: 0, config: { duration: 1500 } });
+      api3.start({ opacity: 1, config: { duration: 1000 } });
+      setLoading(false);
+    } catch (error) {
+      console.error("Error with OpenAI API: ", error);
+    }
+
+    // Color palette API request
     const response2 = await openai.createCompletion({
       model: "text-davinci-003",
       prompt:
@@ -81,64 +101,23 @@ function App() {
       top_p: 1.0,
       frequency_penalty: 0.0,
       presence_penalty: 0.0,
-      stop: [";"],
     });
 
-    setAiOutput(response.data.choices[0].text);
-    api4.start({
-      delay: 200,
-
-      from: {
-        opacity: 1,
-      },
-      to: {
-        opacity: 0,
-      },
-      config: {
-        duration: 1500,
-      },
-      onResolve: () => {
-        setLoading(false);
-      },
-    });
-
-    api3.start({
-      delay: 1000,
-
-      from: {
-        opacity: 0,
-      },
-      to: {
-        opacity: 1,
-      },
-      config: {
-        duration: 1000,
-      },
-    });
     let split = response2.data.choices[0].text
       .split(",")
       .map((color) => color.split("#")[1]);
-    console.log(response2.data.choices[0].text);
 
     setColorOne("#" + split[0].slice(0, 6));
     setColorTwo("#" + split[1].slice(0, 6));
     setColorThree("#" + split[2].slice(0, 6));
     setColorFour("#" + split[3].slice(0, 6));
     setColorFive("#" + split[4].slice(0, 6));
-    if (
-      split[4].trim().includes("Optimistic") ||
-      split[4].trim().includes("optimistic")
-    ) {
+
+    if (split[4].trim().includes("Optimistic")) {
       setWord("optimistic");
-    }
-    if (
-      split[4].trim().includes("Pessimistic") ||
-      split[4].trim().includes("pessimistic")
-    ) {
+    } else if (split[4].trim().includes("Pessimistic")) {
       setWord("pessimistic");
     }
-    const appended = combined + response.data.choices[0].text;
-    setFinalPrompt(appended);
   };
 
   useEffect(() => {
