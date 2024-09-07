@@ -392,13 +392,11 @@ function App() {
                 </animated.div>
               ) : (
                 <animated.div style={springs3}>
-                  {typeIts.length > 0 ? (
-                    typeIts.map((typeIt, index) => (
-                      <div key={index}>{typeIt}</div>
-                    ))
-                  ) : (
-                    <> </>
-                  )}
+                  {typeIts.map((typeIt, index) => {
+                    if (index === typeIts.length - 1) {
+                      return <div key={index}>{typeIt}</div>;
+                    }
+                  })}
                 </animated.div>
               )}
             </Container>
