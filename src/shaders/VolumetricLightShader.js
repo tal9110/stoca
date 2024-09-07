@@ -4,7 +4,6 @@ export const VolumetricLightShader = {
   uniforms: {
     tDiffuse: { value: null },
     lightPosition: { value: new THREE.Vector2(0.5, 0.75) },
-    // lightPosition: { value: new THREE.Vector2(-10, 20) },
 
     exposure: { value: 0.02 },
     decay: { value: 0.95 },
