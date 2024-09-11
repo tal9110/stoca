@@ -1,10 +1,15 @@
+// React and related
 import React, { useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import useStore from "./store";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { useSpring, animated } from "@react-spring/web";
-import { PulseLoader } from "react-spinners";
-import InputBar from "./InputBar";
+
+// Third-party libraries
 import OpenAI from "openai";
+import { isMobile } from "react-device-detect";
+import TypeIt from "typeit-react";
+import { PulseLoader } from "react-spinners";
+
+// Mantine components
 import {
   Image,
   Text,
@@ -14,18 +19,25 @@ import {
   ActionIcon,
   Stack,
   Modal,
+  Tooltip,
+  Button,
 } from "@mantine/core";
-import { isMobile } from "react-device-detect";
-import { VscGithub, VscQuestion } from "react-icons/vsc";
+
+// Icons
+import { VscGithub, VscQuestion, VscGlobe } from "react-icons/vsc";
 import { BsFillArrowRightCircleFill } from "react-icons/bs";
 import { FaLinkedin } from "react-icons/fa";
 import { MdOutlineMail } from "react-icons/md";
+
+// Local components and utilities
+import useStore from "./store";
+import InputBar from "./InputBar";
 import Env from "./Env";
 import Scene from "./Scene";
 import Postproduction from "./Postproduction";
-import TypeIt from "typeit-react";
 
 function App() {
+  // Initialize OpenAI API client
   const openai = new OpenAI({
     apiKey: process.env.REACT_APP_OPENAI_API_KEY,
     organization: "org-xl3gZeUkDOQrIqypLNygYEtZ",
@@ -33,19 +45,24 @@ function App() {
     dangerouslyAllowBrowser: true,
   });
 
+  // State for color palette
   const [colorOne, setColorOne] = useState("#FF6F61"); // Soft coral
   const [colorTwo, setColorTwo] = useState("#F96D00"); // Warm sunset orange
   const [colorThree, setColorThree] = useState("#FFD275"); // Golden yellow
   const [colorFour, setColorFour] = useState("#D64045"); // Deep red-orange
   const [colorFive, setColorFive] = useState("#FF9A8B"); // Light peach-pink
 
+  // State for sentiment word
   const [word, setWord] = useState("");
 
+  // State for AI conversation
   const [finalPrompt, setFinalPrompt] = useState(
     "The following is a conversation with an AI Stoic Philosopher. The philosopher is helpful, creative, clever, friendly, gives brief stoic advice, and asks deep questions.\n\nHuman: Hello, who are you?\nAI: I am an AI created by OpenAI. How are you feeling? "
   );
   const [firstClick, setFirstClick] = useState(0);
-  const [aiOutput, setAiOutput] = useState("");
+  const [aiResponses, setAiResponses] = useState([]);
+
+  // State for UI elements
   const inputStore = useStore((state) => state.inputStore);
   const [firstInput, setFirstInput] = useState(false);
   const [inputHeaderText, setInputHeaderText] = useState("");
@@ -57,13 +74,13 @@ function App() {
   const [modalFont, setModalFont] = useState(26);
   const [typeIts, setTypeIts] = useState([]);
 
-  const [aiResponses, setAiResponses] = useState([]);
-
+  // Function to generate AI response and color palette
   const generateResponse2 = async (inputt) => {
     setFirstClick(firstClick + 1);
     setLoading(true);
 
     try {
+      // Generate AI response
       const completion = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
@@ -83,6 +100,7 @@ function App() {
       );
       console.log("AI Response:", aiResponse);
 
+      // Update AI responses and final prompt
       setAiResponses((prevResponses) => [...prevResponses, aiResponse]);
       setFinalPrompt(
         (prevPrompt) => prevPrompt + "\nHuman:" + inputt + "\nAI:" + aiResponse
@@ -119,6 +137,7 @@ function App() {
       const paletteResponse = colorCompletion.choices[0].message.content;
       console.log("Palette Response:", paletteResponse);
 
+      // Extract hex colors from the response
       const hexColors = paletteResponse.match(/#[0-9A-Fa-f]{6}/g);
 
       if (hexColors && hexColors.length >= 5) {
@@ -131,6 +150,7 @@ function App() {
         console.error("Unexpected format: Not enough colors in response.");
       }
 
+      // Set sentiment word
       if (paletteResponse.includes("Optimistic")) {
         setWord("optimistic");
       } else if (paletteResponse.includes("Pessimistic")) {
@@ -146,6 +166,7 @@ function App() {
     }
   };
 
+  // Effect to handle new AI responses
   useEffect(() => {
     if (aiResponses.length > 0) {
       const latestResponse = aiResponses[aiResponses.length - 1];
@@ -166,6 +187,7 @@ function App() {
 
       setTypeIts([newTypeIt]); // Only keep the latest response
 
+      // Animate the response appearance
       api4.start({
         delay: 0,
         from: { opacity: 0 },
@@ -175,11 +197,13 @@ function App() {
     }
   }, [aiResponses]);
 
+  // Effect to handle new user input
   useEffect(() => {
     setEnterIncrement(enterIncrement + 1);
     if (inputStore.length > 0) {
       setLoading(true);
 
+      // Animate the transition from initial question to user input
       api.start({
         delay: 100,
         from: { opacity: 1 },
@@ -215,12 +239,14 @@ function App() {
     }
   }, [inputStore]);
 
+  // Animation springs
   const [springs, api] = useSpring(() => ({ from: { opacity: 0 } }));
   const [springs2, api2] = useSpring(() => ({ from: { opacity: 0 } }));
   const [springs3, api3] = useSpring(() => ({ from: { opacity: 1 } }));
   const [springs4, api4] = useSpring(() => ({ from: { opacity: 1 } }));
   const [springs5, api5] = useSpring(() => ({ from: { opacity: 0 } }));
 
+  // Effect for initial animations
   useEffect(() => {
     api.start({
       delay: 999,
@@ -236,6 +262,7 @@ function App() {
     });
   }, []);
 
+  // Effect to handle mobile devices
   useEffect(() => {
     if (isMobile) {
       setOpened(true);
@@ -246,7 +273,7 @@ function App() {
 
   return (
     <>
-      {/* Header */}
+      {/* Header Section */}
       <div
         style={{
           position: "absolute",
@@ -258,18 +285,22 @@ function App() {
       >
         <CenterMantine>
           <Stack mt={60}>
+            {/* Conditional rendering based on whether it's the first input or not */}
             {firstInput ? (
+              // Display the user's input as the header
               <Container>
                 <animated.div style={springs2}>
                   <Text className="theHeaderInput">{inputHeaderText}</Text>
                 </animated.div>
               </Container>
             ) : (
+              // Display the initial question with a typing animation
               <animated.div style={springs}>
                 <TypeIt
                   className="theHeader"
                   options={{
                     afterComplete: () => {
+                      // Hide the cursor after typing is complete
                       document.querySelector(".ti-cursor").style.display =
                         "none";
                     },
@@ -279,8 +310,11 @@ function App() {
                 </TypeIt>
               </animated.div>
             )}
+
+            {/* Container for AI response or loading indicator */}
             <Container mt={40}>
               {loading ? (
+                // Show loading animation while waiting for AI response
                 <animated.div style={springs4}>
                   <PulseLoader
                     color={"#53504A"}
@@ -290,6 +324,7 @@ function App() {
                   />
                 </animated.div>
               ) : (
+                // Display the latest AI response
                 <animated.div style={springs4}>
                   {typeIts[0]} {/* Only display the latest response */}
                 </animated.div>
@@ -304,7 +339,7 @@ function App() {
         <InputBar word={word} />
       </animated.div>
 
-      {/* Wordmark and Question Mark */}
+      {/* Wordmark (Logo) */}
       <Image
         className="wordmark"
         sx={{
@@ -316,6 +351,8 @@ function App() {
         src={"/wordmark.png"}
         width={60}
       />
+
+      {/* Question Mark Icon (Opens About Modal) */}
       <div
         style={{
           position: "absolute",
@@ -353,45 +390,87 @@ function App() {
       >
         <CenterMantine mt={30}>
           <Stack spacing="xl" align="center">
+            {/* App Logo */}
             <Image src="/logo.png" width={60} mb={20} />
+
+            {/* App Description */}
             <div style={{ fontSize: modalFont }} className="mobileModal">
               Stoca takes you on a reflective journey with a stoic philosopher
               AI while changing the colors & music to reflect your mood in real
               time
             </div>
+
+            {/* Creator Information and Social Links */}
             <div style={{ width: "50%" }}>
               <div style={{ fontSize: 21.5 }} className="mobileModal">
                 Created by Tal Halperin
               </div>
               <CenterMantine mt={10} mb={20}>
-                <Group spacing={30}>
-                  <ActionIcon
-                    onClick={() =>
-                      (window.location = "mailto:tal9110@gmail.com")
-                    }
-                  >
-                    <MdOutlineMail size={30} style={{ fill: "#A8A28F" }} />
-                  </ActionIcon>
-                  <ActionIcon
-                    onClick={() =>
-                      window.open("http://github.com/tal9110", "_blank")
-                    }
-                  >
-                    <VscGithub size={30} style={{ fill: "#A8A28F" }} />
-                  </ActionIcon>
-                  <ActionIcon
+                <Stack>
+                  <Group spacing={30}>
+                    {/* Email Link */}
+                    <Tooltip label="Email" color="#A8A28F">
+                      <ActionIcon
+                        onClick={() =>
+                          (window.location = "mailto:tal9110@gmail.com")
+                        }
+                      >
+                        <MdOutlineMail size={30} style={{ fill: "#A8A28F" }} />
+                      </ActionIcon>
+                    </Tooltip>
+                    {/* GitHub Link */}
+                    <Tooltip label="GitHub" color="#A8A28F">
+                      <ActionIcon
+                        onClick={() =>
+                          window.open("http://github.com/tal9110", "_blank")
+                        }
+                      >
+                        <VscGithub size={30} style={{ fill: "#A8A28F" }} />
+                      </ActionIcon>
+                    </Tooltip>
+                    {/* LinkedIn Link */}
+                    <Tooltip label="LinkedIn" color="#A8A28F">
+                      <ActionIcon
+                        onClick={() =>
+                          window.open(
+                            "http://www.linkedin.com/in/tal-halperin",
+                            "_blank"
+                          )
+                        }
+                      >
+                        <FaLinkedin size={30} style={{ fill: "#A8A28F" }} />
+                      </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label="Portfolio" color="#A8A28F">
+                      <ActionIcon
+                        onClick={() =>
+                          window.open(
+                            "https://projects.talhalperin.com",
+                            "_blank"
+                          )
+                        }
+                      >
+                        <VscGlobe size={30} style={{ fill: "#A8A28F" }} />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+                  <Button
                     onClick={() =>
                       window.open(
-                        "http://www.linkedin.com/in/tal-halperin",
+                        "https://projects.talhalperin.com/projects/stoca",
                         "_blank"
                       )
                     }
+                    variant="light"
+                    color="dark"
                   >
-                    <FaLinkedin size={30} style={{ fill: "#A8A28F" }} />
-                  </ActionIcon>
-                </Group>
+                    Technical breakdown ↗
+                  </Button>
+                </Stack>
               </CenterMantine>
             </div>
+
+            {/* Technology Stack Information */}
             <div style={{ fontSize: 13 }} className="mobileModal">
               This web experiment harnesses the technology of OpenAI's ChatGPT3
               API and React Three Fiber. You can find the code{" "}
@@ -437,12 +516,13 @@ function App() {
         </Modal>
       )}
 
-      {/* React Three Fiber Canvas */}
+      {/* React Three Fiber Canvas (3D Scene) */}
       <Canvas
         shadows
         camera={{ position: [0, 0, 6.5], fov: 50 }}
         gl={{ antialias: false }}
       >
+        {/* Main Scene Group */}
         <group position={[0.2, -1.5, 0]}>
           <Scene
             firstClick={firstClick}
@@ -453,7 +533,11 @@ function App() {
             colorFive={colorFive}
           />
         </group>
+
+        {/* Environment Component */}
         <Env enterIncrement={enterIncrement} />
+
+        {/* Post-processing (only for non-mobile devices) */}
         {!isMobile && <Postproduction />}
       </Canvas>
     </>
